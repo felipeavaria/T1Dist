@@ -1,6 +1,5 @@
 #!/bin/sh
 
-gnome-terminal --working-directory="/home/felipe/Escritorio/Tarea 1/cliente" &
-gnome-terminal --working-directory="/home/felipe/Escritorio/Tarea 1/serv_distrito" &
-gnome-terminal --working-directory="/home/felipe/Escritorio/Tarea 1/serv_central" &
-
+termite -d "/home/aczombie/Documentos/Dropbox/2017-2/Sistemas Distribuidos/Tarea 1/cliente" &
+termite -d "/home/aczombie/Documentos/Dropbox/2017-2/Sistemas Distribuidos/Tarea 1/serv_distrito" &
+termite -d "/home/aczombie/Documentos/Dropbox/2017-2/Sistemas Distribuidos/Tarea 1/serv_central" &

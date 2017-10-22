@@ -10,6 +10,10 @@ public class serv_distrito {
     //final static String INET_ADDR = "224.0.0.3";
     //final static int PORT = 8888;
 		public static String nombre = "";
+		public String INET_ADDR = "224.0.0.3";
+		public int PORT = 8888;
+		public int PORT_UCAST = 8887;
+		public Thread thread1;
 
     public static void main(String[] args) throws UnknownHostException, InterruptedException {
 			new serv_distrito();
@@ -21,14 +25,68 @@ public class serv_distrito {
 			System.out.println("Ingrese nombre del Distrito:");
 			nombre = in.nextLine();
 
+
+			thread1 = new Thread() {
+				public void run() {
+						try {
+							//InetAddress address = InetAddress.getByName(INET_ADDR);
+								System.out.println("recibiendo mensajes unicast en "+PORT_UCAST);
+							  DatagramSocket serverSocket = new DatagramSocket(PORT_UCAST);
+								byte[] receiveData = new byte[256];
+								byte[] sendData = new byte[1024];
+								while(true) {
+											DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+											serverSocket.receive(receivePacket);
+											String s= new String( receivePacket.getData());
+											System.out.println("RECEIVED: " + s);
+											if(s == "1"){
+												System.out.println("Lista de Titanes:");
+											}
+											else if(s == "2"){
+												System.out.println("Ingrese los datos del distrito a cambiar");
+											}
+											else if(s == "3"){
+												System.out.println("Titan Capturado! (ficticiamente)");
+											}
+											else if(s == "4"){
+												System.out.println("Titan asesinado! eres malvado");
+											}
+											else if(s == "5"){
+												System.out.println("Listado de Titantes Capturados :D");
+											}
+											else if(s == "6"){
+												System.out.println("Listado de Titanes Asesinados :( ");
+											}
+
+											InetAddress IPAddress = receivePacket.getAddress();
+											System.out.println("IP: " + IPAddress);
+											int port = receivePacket.getPort();
+											String capitalizedSentence = "Si.... he recibido el mensaje";
+											sendData = capitalizedSentence.getBytes();
+											DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+											serverSocket.send(sendPacket);
+									 }
+						}
+						catch(Exception e){
+							 e.printStackTrace();
+						}
+				}
+			};
+
+
+			thread1.start();
 			menu(in);
 		}
 
-
+		
 		public void menu(Scanner in) throws UnknownHostException, InterruptedException{
 			boolean menu = true;
 			int choose = 0; 
 
+			System.out.println("Ingrese el Puerto del Servidor");
+			String puerto = in.nextLine();
+			if (puerto != "")
+				PORT = Integer.parseInt(puerto);
 
 			while(menu){
 				System.out.println("[Distrito "+nombre+"] Elegir Opción:");
@@ -121,8 +179,8 @@ public class serv_distrito {
 
 
 		public void sendMessage(String msg) throws UnknownHostException, InterruptedException{
-			String INET_ADDR = "224.0.0.3";
-			int PORT = 8888;
+			//String INET_ADDR = "224.0.0.3";
+			//int PORT = 8888;
 
 			InetAddress addr = InetAddress.getByName(INET_ADDR);
 			try (DatagramSocket serverSocket = new DatagramSocket()) {
@@ -137,8 +195,6 @@ public class serv_distrito {
 
 
 		public void sendMessages() throws UnknownHostException, InterruptedException{
-			String INET_ADDR = "224.0.0.3";
-			int PORT = 8888;
 
 			InetAddress addr = InetAddress.getByName(INET_ADDR);
 			try (DatagramSocket serverSocket = new DatagramSocket()) {

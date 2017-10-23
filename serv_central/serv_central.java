@@ -4,6 +4,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.net.MulticastSocket;
 
 public class serv_central {
     
@@ -12,8 +13,9 @@ public class serv_central {
 		//Convertir String a int: int foo = Integer.parseInt("1234");
 		public String INET_ADDR = "224.0.0.3";
 		public int PORT = 8888;
-		public String[][] data = new String[5][5];
+		public String[][] data = new String[5][500];
 		public int dist_count = 0;
+		
 
     public static void main(String[] args) throws UnknownHostException, InterruptedException {
 			new serv_central();
@@ -28,6 +30,19 @@ public class serv_central {
 
 		public void menu(Scanner in) throws UnknownHostException, InterruptedException{
 			boolean menu = true;
+			Thread hiloA;
+			hiloA = new Thread(){
+						public void run(){
+							try{
+								recibirMensajes();
+							}catch (IOException ex){
+								ex.printStackTrace();
+							}
+						}
+					};
+					hiloA.start();
+					
+
 			int choose = 0; 
 			while(menu){
 				System.out.println("Elegir Opción:");
@@ -43,7 +58,11 @@ public class serv_central {
 					sendMessages();
 				}
 				else if(choose == 3){
+					hiloA.stop();
 					menu = false;
+				}
+				else if(choose == 4){
+					recibirMensajes();	
 				}
 				else{
 					System.out.println("Opcion no reconocida. Elegir otra opción");
@@ -89,7 +108,7 @@ public class serv_central {
 							String msg = "Sent message no " + i;
 
 							DatagramPacket msgPacket = new DatagramPacket(msg.getBytes(),
-											msg.getBytes().length, addr, PORT);
+											msg.getBytes().length, addr, 8889);
 							serverSocket.send(msgPacket);
 	 
 							System.out.println("Server sent packet with msg: " + msg);
@@ -99,6 +118,29 @@ public class serv_central {
 					ex.printStackTrace();
 			}
 		}
+
+		public static void recibirMensajes()  throws UnknownHostException {
+				String INET_ADDR = "224.0.0.3";
+				int PORT = 8888;
+        			InetAddress address = InetAddress.getByName(INET_ADDR);
+       				byte[] buf = new byte[256];
+        			try (MulticastSocket clientSocket = new MulticastSocket(PORT)){
+            				clientSocket.joinGroup(address);
+     
+            				while (true) {
+                			   DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
+                			   clientSocket.receive(msgPacket);
+                			   String msg;
+                			   msg = new String(buf, 0, buf.length);
+                			   System.out.println("Socket 1 received msg: " + msg);
+            				}
+        			} catch (IOException ex) {
+            		              ex.printStackTrace();
+        	                } 
+	         }
+
+
+		
 
 
 }

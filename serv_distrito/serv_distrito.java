@@ -4,20 +4,39 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.util.ArrayList;
+
 
 public class serv_distrito {
     
-    //final static String INET_ADDR = "224.0.0.3";
-    //final static int PORT = 8888;
+
 		public static String nombre = "";
 		public String INET_ADDR = "224.0.0.3";
 		public int PORT = 8888;
 		public int PORT_UCAST = 8887;
 		public Thread thread1;
+		public ArrayList<Titan> titanes = new ArrayList<Titan>();
+		public int curr_id = 0;
+
 
     public static void main(String[] args) throws UnknownHostException, InterruptedException {
 			new serv_distrito();
     }
+
+
+		public class Titan {
+			int ID;
+			String Name;
+			int Estado, Tipo;
+			public Titan() {
+			}
+			public Titan(int ID_, String Name_, int Tipo_, int Estado_) {
+				this.ID = ID_;
+				this.Name = Name_;
+				this.Estado = Estado_;
+				this.Tipo = Tipo_;
+			}
+		}
 
 
 		public serv_distrito() throws UnknownHostException, InterruptedException {
@@ -25,44 +44,49 @@ public class serv_distrito {
 			System.out.println("Ingrese nombre del Distrito:");
 			nombre = in.nextLine();
 
-
 			thread1 = new Thread() {
 				public void run() {
 						try {
 							//InetAddress address = InetAddress.getByName(INET_ADDR);
-								System.out.println("recibiendo mensajes unicast en "+PORT_UCAST);
+								//System.out.println("recibiendo mensajes unicast en "+PORT_UCAST);
 							  DatagramSocket serverSocket = new DatagramSocket(PORT_UCAST);
 								byte[] receiveData = new byte[256];
 								byte[] sendData = new byte[1024];
+								String stringResponse = "";
 								while(true) {
 											DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 											serverSocket.receive(receivePacket);
-											String s= new String( receivePacket.getData());
-											System.out.println("RECEIVED: " + s);
-											if(s == "1"){
-												System.out.println("Lista de Titanes:");
+											//String s= new String( receivePacket.getData());
+											String[] s = new String(receivePacket.getData(), receivePacket.getOffset(), receivePacket.getLength()).split("-");
+											//System.out.println("RECEIVED: " + s);
+											if(s[0].equals("1")){
+												stringResponse+="Lista de Titanes:";
+												stringResponse = imprimirTitanesCliente(0);
 											}
-											else if(s == "2"){
-												System.out.println("Ingrese los datos del distrito a cambiar");
+											else if(s[0].equals("2")){
+												stringResponse+="Ingrese los datos del distrito a cambiar";
 											}
-											else if(s == "3"){
-												System.out.println("Titan Capturado! (ficticiamente)");
+											else if(s[0].equals("3")){
+												stringResponse = manipularTitan(Integer.parseInt(s[1]), 1);
+												stringResponse+="Titan Capturado! (ficticiamente)";
 											}
-											else if(s == "4"){
-												System.out.println("Titan asesinado! eres malvado");
+											else if(s[0].equals("4")){
+												stringResponse = manipularTitan(Integer.parseInt(s[1]), 2);
+												stringResponse+="Titan asesinado! eres malvado";
 											}
-											else if(s == "5"){
-												System.out.println("Listado de Titantes Capturados :D");
+											else if(s[0].equals("5")){
+												stringResponse+="Listado de Titantes Capturados :D";
+												stringResponse = imprimirTitanesCliente(1);
 											}
-											else if(s == "6"){
-												System.out.println("Listado de Titanes Asesinados :( ");
+											else if(s[0].equals("6")){
+												stringResponse+="Listado de Titanes Asesinados :( ";
+												stringResponse = imprimirTitanesCliente(2);
 											}
 
 											InetAddress IPAddress = receivePacket.getAddress();
 											System.out.println("IP: " + IPAddress);
 											int port = receivePacket.getPort();
-											String capitalizedSentence = "Si.... he recibido el mensaje";
-											sendData = capitalizedSentence.getBytes();
+											sendData = stringResponse.getBytes();
 											DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
 											serverSocket.send(sendPacket);
 									 }
@@ -72,8 +96,6 @@ public class serv_distrito {
 						}
 				}
 			};
-
-
 			thread1.start();
 			menu(in);
 		}
@@ -82,7 +104,7 @@ public class serv_distrito {
 		public void menu(Scanner in) throws UnknownHostException, InterruptedException{
 			boolean menu = true;
 			int choose = 0; 
-
+			//Opciones de Inicialicación de Servidor
 			System.out.println("Ingrese el Puerto del Servidor");
 			String puerto = in.nextLine();
 			if (puerto != "")
@@ -93,7 +115,8 @@ public class serv_distrito {
 				System.out.println("[Distrito "+nombre+"] 1) Agregar Distrito");
 				System.out.println("[Distrito "+nombre+"] 2) Agregar Titan");
 				System.out.println("[Distrito "+nombre+"] 3) Enviar Mensajes a Clientes");
-				System.out.println("[Distrito "+nombre+"] 4) Salir");
+				System.out.println("[Distrito "+nombre+"] 4) Imprimir Titanes");
+				System.out.println("[Distrito "+nombre+"] 5) Salir");
 				choose = in.nextInt();
 
 				if(choose == 1){
@@ -106,11 +129,13 @@ public class serv_distrito {
 					sendMessages();
 				}
 				else if(choose == 4){
+					imprimirTitanes();
+				}
+				else if(choose == 5){
 					menu = false;
 				}
 				else{
 					System.out.println("Opcion no reconocida. Elegir otra opción");
-				
 				}
 			}
 		}
@@ -150,6 +175,7 @@ public class serv_distrito {
 
 		public void agregarTitan(Scanner in) throws UnknownHostException, InterruptedException{
 			int tipo_titan;
+			int id_titan = 0;
 			String name_titan;
 
 			in.nextLine();
@@ -164,23 +190,116 @@ public class serv_distrito {
 			in.nextLine();
 			//Agregar el Titan a la base de datos, con las variables anteriores para obtener el ID
 			System.out.println("************");
-			System.out.println("ID: ");
+			System.out.println("ID: "+curr_id);
 			System.out.println("Nombre: "+name_titan+"");
 			System.out.println("Tipo: "+tipo_titan+"");
 			System.out.println("************");
-			/********************/
-			// Avisar a los Cientes (a través de Multicast), que Titan nuevo ha aparecido, de la siguiente
-			// forma:
-			// [Cliente] Aparece nuevo Titan! Eren, tipo Cambiante, ID 1.
-			/********************/
-			String msg = "Aparece nuevo Titan! "+name_titan+", tipo "+tipo_titan+", ID: ?";
+
+			id_titan = curr_id;
+			Titan titan = new Titan(id_titan, name_titan, tipo_titan, 0);
+			titanes.add(titan);
+			curr_id++;
+			String msg = "Aparece nuevo Titan! "+name_titan+", tipo "+tipo_titan+", ID: "+id_titan+""; 
 			sendMessage(msg);
 		}
 
 
+		public void imprimirTitanes() {
+			Titan aux;
+			System.out.println("Lista de titanes:");
+			if(titanes.size() == 0){
+					System.out.println("No se han registrado Titanes en Distrito");
+			}
+			else {
+				for(int i = 0; i<titanes.size(); i++){
+					aux = titanes.get(i);
+					System.out.println("************");
+					System.out.println("ID: "+aux.ID);
+					System.out.println("Nombre: "+aux.Name+"");
+					System.out.println("Tipo: "+aux.Tipo+"");
+					System.out.println("Estado: "+aux.Estado+"");
+					System.out.println("************");
+				}
+			}
+		}
+
+
+		public String imprimirTitanesCliente(int opcion) {
+				Titan aux;
+				String response = "";
+				System.out.println("Lista de titanes:");
+				if(opcion == 0){
+					if(titanes.size() == 0){
+							response = "No se han registrado Titanes en Distrito";
+					}
+					else {
+						for(int i = 0; i<titanes.size(); i++){
+							aux = titanes.get(i);
+							response+="************\n";
+							response+="ID: "+aux.ID+"\n";
+							response+="Nombre: "+aux.Name+"\n";
+							response+="Tipo: "+aux.Tipo+"\n";
+							response+="Estado: "+aux.Estado+"\n";
+							response+="************\n";
+						}
+					}
+					return response;
+				}
+				else {
+					ArrayList<Titan> resp = new ArrayList<Titan>();
+					for(int i=0; i<titanes.size(); i++){
+						aux = titanes.get(i);
+						if (aux.Estado == opcion){
+							resp.add(aux);
+						}
+					}
+					if(resp.size() == 0){
+							response = "No se han registrado Titanes en Distrito";
+					}
+					else {
+						for(int i = 0; i<resp.size(); i++){
+							aux = resp.get(i);
+							response+="************\n";
+							response+="ID: "+aux.ID+"\n";
+							response+="Nombre: "+aux.Name+"\n";
+							response+="Tipo: "+aux.Tipo+"\n";
+							response+="Estado: "+aux.Estado+"\n";
+							response+="************\n";
+						}
+					}
+					return response;
+				}
+		}
+
+
+		public String manipularTitan(int id_titan, int accion) {
+				Titan aux;
+				for(int i=0; i<titanes.size(); i++){
+					aux = titanes.get(i);
+					if (aux.ID == id_titan && aux.Estado == 0){
+						aux.Estado = accion;
+						return "Titan "+aux.Name+" manipulado con "+accion+", con id="+aux.ID+"; "; 
+					}
+				}
+				System.out.println("Titan no disponible (ya capturado, asesinado, o no pertenece a distrito)");
+				return "Titan no disponible (ya capturado, asesinado, o no pertenece a distrito)";
+		}
+
+
+		public String enviarEstado(int Estado){
+			if (Estado == 0){
+				return "Libre";
+			}
+			else if (Estado == 1) {
+				return "Capturado";
+			}
+			else{
+				return "Asesinado";
+			}
+		}
+
+
 		public void sendMessage(String msg) throws UnknownHostException, InterruptedException{
-			//String INET_ADDR = "224.0.0.3";
-			//int PORT = 8888;
 
 			InetAddress addr = InetAddress.getByName(INET_ADDR);
 			try (DatagramSocket serverSocket = new DatagramSocket()) {
@@ -195,16 +314,13 @@ public class serv_distrito {
 
 
 		public void sendMessages() throws UnknownHostException, InterruptedException{
-
 			InetAddress addr = InetAddress.getByName(INET_ADDR);
 			try (DatagramSocket serverSocket = new DatagramSocket()) {
 					for (int i = 0; i < 5; i++) {
 							String msg = "Sent message no " + i;
-
 							DatagramPacket msgPacket = new DatagramPacket(msg.getBytes(),
 											msg.getBytes().length, addr, PORT);
 							serverSocket.send(msgPacket);
-	 
 							System.out.println("Server sent packet with msg: " + msg);
 							Thread.sleep(500);
 					}

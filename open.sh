@@ -1,6 +1,6 @@
 #!/bin/sh
 
-gnome-terminal --working-directory="/home/felipe/Escritorio/Tarea 1/cliente" &
-gnome-terminal --working-directory="/home/felipe/Escritorio/Tarea 1/serv_distrito" &
-gnome-terminal --working-directory="/home/felipe/Escritorio/Tarea 1/serv_central" &
+gnome-terminal --working-directory="/home/felipe/Escritorio/sistemas distribuidos/T1Dist/cliente" &
+gnome-terminal --working-directory="/home/felipe/Escritorio/sistemas distribuidos/T1Dist/serv_distrito" &
+gnome-terminal --working-directory="/home/felipe/Escritorio/sistemas distribuidos/T1Dist/serv_central" &
 

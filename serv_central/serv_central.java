@@ -34,19 +34,22 @@ public class serv_central {
 		public ArrayList<clienteEntrante> clientes = new ArrayList<clienteEntrante>();
 		public Object lock = new Object();
 		public MulticastSocket clientSocket;
-		public class clienteEntrante{
+
+
+public class clienteEntrante{
 			InetAddress IP;
 			String msg;
 			DatagramPacket request;
 			DatagramSocket socket;
 			public clienteEntrante() {
-			public clienteEntrante(InetAddress ID_, String msj, DatagramPacket a, DatagramSocket b) {
+
 			}
+			public clienteEntrante(InetAddress ID_, String msj, DatagramPacket a, DatagramSocket b) {
 				this.request = a;
 				this.IP = ID_;
-			}
 				this.socket = b;
 				this.msg = msj;
+			}
 		}
 
     public static void main(String[] args) throws UnknownHostException, InterruptedException {
@@ -102,13 +105,13 @@ public class serv_central {
 		public class Distrito{
 			String Nombre;
 			String ip_multicast;
-			int p_multicast;
+			String p_multicast;
 			String ip_peticiones;
-			int p_peticiones;
+			String p_peticiones;
 
 			public Distrito(){
 			}
-			public Distrito(String Nombre_,String ip_multicast_,int p_multicast_,String ip_peticiones_,int p_peticiones_){
+			public Distrito(String Nombre_,String ip_multicast_,String p_multicast_,String ip_peticiones_,String p_peticiones_){
 				this.Nombre = Nombre_;
 				this.ip_multicast=ip_multicast_;
 				this.p_multicast = p_multicast_;
@@ -121,11 +124,11 @@ public class serv_central {
 
 		public void menu() throws UnknownHostException, InterruptedException{
 			boolean menu = true;
-
+			//Scanner in= new Scanner(System.in);
 			/*
 			EscucharMensajes escucha = new EscucharMensajes();
 			*/
-			escucha.start();
+			//escucha.start();
 
 			while(menu){
 				System.out.println("Elegir Opción:");
@@ -135,27 +138,6 @@ public class serv_central {
 				System.out.println("4) Permitir conexión de cliente");
 				System.out.println("5) Salir");
 
-<<<<<<<
-        //synchronized (lock) {
-=======
-				if(choose == 1){
-					agregarDistrito(in);
-				}
-				else if(choose == 2){
-					mostrarDistritos(in);
-				}
-        else if(choose == 3){
-					int puerto_clientes;
-					System.out.println("ingrese el puerto de los clientes");
-					puerto_clientes = in.nextInt();
-					sendMessages("Mensajes para todos los clientes del puerto "+puerto_clientes,puerto_clientes);
-				}
-				else if(choose == 4){
-					//hiloA.stop();
-					menu = false;
-				}
-				else if(choose == 5){
->>>>>>>
 
 					String user_input = waitInput();
 					System.out.println("String recieved!");
@@ -170,7 +152,7 @@ public class serv_central {
 						mostrarDistritos();
 					}
 					else if(user_input.equals("3")){
-						sendMessages();
+						//sendMessages();
 					}
 					else if(user_input.equals("4")){
 						//hiloA.stop();
@@ -199,10 +181,11 @@ public class serv_central {
 		}
 
 
+
 		public void agregarDistrito() throws InterruptedException{
 			int a;
 			String nombre, ip_multicast, ip_peticiones;
-			int p_multicast, p_peticiones;
+			String p_multicast, p_peticiones;
 
 			//in.nextLine();
 			System.out.println("Nombre Distrito:");
@@ -239,13 +222,12 @@ public class serv_central {
 			System.out.println("\n");
 		}
 
-    public void mostrarDistritos(Scanner in){
+    public void mostrarDistritos(){
 			Distrito aux;
 			System.out.println("Lista de dsitritos:");
 			if(distritos.size() == 0){
-			}
 					System.out.println("No se han registrado Distritos");
-			else {
+			}else {
 				for(int i = 0; i<distritos.size(); i++){
 					aux = distritos.get(i);
 					System.out.println("************");
@@ -286,7 +268,7 @@ public class serv_central {
 					 System.out.println("Dar autorizacion a /IP: "+aux.IP+" por Distrito X");
 					 System.out.println("6.- SI");
 					 System.out.println("7.- NO");
-					 
+
 					DatagramPacket respuesta =
 						new DatagramPacket(peticion.getData(), peticion.getLength(),
 															 peticion.getAddress(), peticion.getPort());
@@ -307,7 +289,7 @@ public class serv_central {
 					 clientSocket.send(respuesta);
 					} catch (Exception e){}
 				}
-			
+
 			}
 
 			else{
@@ -343,9 +325,9 @@ public class serv_central {
 
 														 System.out.println("Esperando lock");
 													//lock.wait();
-													 int numero_distrito = buscarDistrito(nombre);
+													 //int numero_distrito = buscarDistrito(nombre);
 													// if(numero_distrito > 0){
-														clienteEntrante aux = new clienteEntrante(msgPacket.getAddress(), 
+														clienteEntrante aux = new clienteEntrante(msgPacket.getAddress(),
 																msg, msgPacket, clientSocket);
 														clientes.add(aux);
 
@@ -365,7 +347,7 @@ public class serv_central {
 														 client_requesting = false;
 														 //lock.notify();
 														 System.out.println("Coloque opción nueva del menú");
-														 
+
 												//	}
 
                       //   }
@@ -387,8 +369,7 @@ public class serv_central {
 			}
 		}
 
-      public static int buscarDistrito(String nombre){
-          return 0;
+
       public static boolean buscarDistrito(String nombre, ArrayList<Distrito> distritos ){
 					Distrito aux;
 					boolean salida=false;

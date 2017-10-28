@@ -12,7 +12,7 @@ public class cliente {
     
 		public String INET_ADDR = "224.0.0.3";
 		public int PORT = 8888;
-		public int PORT_UCAST = 8887;
+		//public int PORT_UCAST = 8887;
 		public Thread thread1;
 
 
@@ -60,18 +60,32 @@ public class cliente {
 		}
 
 
-		 public void sendUnicastMsg(String s) throws Exception {
+		 public void sendUnicastMsg(String s, int target) throws Exception {
 				//BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
 				//System.out.println("Sending Unicast Message to Port "+PORT_UCAST);
 				DatagramSocket clientSocket = new DatagramSocket();
 				InetAddress IPAddress = InetAddress.getByName("localhost");
 				byte[] sendData = new byte[1024];
 				byte[] receiveData = new byte[1024];
+				int PORT_UCAST;
 				//String sentence = inFromUser.readLine();
 				sendData = s.getBytes();
+
+				// Aqui abrire la lógica, para enviar:
+				// serv_central: pedir conexión a distrito, y obtener info
+				// serv_distrito: acciones a un titan
+				if(target == 0){
+					PORT_UCAST = 8886;
+				}
+				else {
+					PORT_UCAST = 8887;
+				}
+				// Fin bloque seleccion de ida de mensaje
+
 				DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, PORT_UCAST);
 				clientSocket.send(sendPacket);
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+				System.out.println("Esperando respuesta del servidor central...");
 				clientSocket.receive(receivePacket);
 				String modifiedSentence = new String(receivePacket.getData());
 				System.out.println(modifiedSentence);
@@ -101,37 +115,39 @@ public class cliente {
 
 				if(choose == 1){
 					String in_msg = "1";
-					sendUnicastMsg(in_msg);
+					sendUnicastMsg(in_msg, 1);
 				}
 				else if(choose == 2){
 					String in_msg = "2";
-					sendUnicastMsg(in_msg);
+					sendUnicastMsg(in_msg, 1);
 				}
 				else if(choose == 3){
 					System.out.println("Ingrese el ID del titan a capturar");
 					titan_id = in.nextInt();
 					in.nextLine();
 					String in_msg = "3-"+titan_id;
-					sendUnicastMsg(in_msg);
+					sendUnicastMsg(in_msg, 1);
 				}
 				else if(choose == 4){
 					System.out.println("Ingrese el ID del titan a asesinar");
 					titan_id = in.nextInt();
 					in.nextLine();
 					String in_msg = "4-"+titan_id;
-					sendUnicastMsg(in_msg);
+					sendUnicastMsg(in_msg, 1);
 				}
 				else if(choose == 5){
 					String in_msg = "5";
-					sendUnicastMsg(in_msg);
+					sendUnicastMsg(in_msg, 1);
 				}
 				else if(choose == 6){
 					String in_msg = "6";
-					sendUnicastMsg(in_msg);
+					sendUnicastMsg(in_msg, 1);
 				}
 				else if(choose == 7){
-					//conectarDistrito(in);
-					ConectarServCentral(in);
+					// ConectarServCentral(in);
+					String in_msg = "0-trost";
+					sendUnicastMsg(in_msg, 0);
+
 				}
 				else if(choose == 8){
 					recibirMensajes();

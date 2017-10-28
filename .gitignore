@@ -4,3 +4,9 @@ open.sh
 *.swp
 *.swo
 *.class
+
+*.swl
+
+*.swm
+
+serv_distrito/borrame\.java

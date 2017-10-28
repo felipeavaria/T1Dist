@@ -263,96 +263,73 @@ public class clienteEntrante{
 					try{
 					clienteEntrante aux = clientes.remove(0);
 					DatagramPacket peticion = aux.request;
-
-
-					 System.out.println("Dar autorizacion a /IP: "+aux.IP+" por Distrito X");
-					 System.out.println("6.- SI");
-					 System.out.println("7.- NO");
-
-					DatagramPacket respuesta =
-						new DatagramPacket(peticion.getData(), peticion.getLength(),
-															 peticion.getAddress(), peticion.getPort());
-
-					 //String res = in2.nextLine();
-					 //user_input = in2.nextLine();
-					 //String res = user_input;
-					 System.out.println("Waiting option");
-					String option = waitInput();
-
-					 System.out.println("option recived!");
-					 //user_input = "";
-					 System.out.println("res dice: "+option);
-					 client_requesting = false;
-					 lock.notify();
-					 System.out.println("Coloque opción nueva del menú");
-					 //aux.socket.send(respuesta);
-					 clientSocket.send(respuesta);
-					} catch (Exception e){}
+					 System.out.println("Dar autorizacion a /IP: "+aux.IP+" para Distrito "+aux.msg);
+					 System.out.println("1.- SI");
+					 System.out.println("2.- NO");
+					 String ans = waitInput();
+					 String response = "";
+						if (ans.equals("1")){
+							response = "Datos distrito: (Proximamente)";
+							//Aqui falta poner los datos del distrito, que estan en el listado de distritos,
+							//para poder enviar la respuesta de servidor al cliente
+						}
+						else if(ans.equals("2")){
+							response = "Conexión rechazada al servidor";
+						}
+						InetAddress IPAddress = peticion.getAddress();
+						int port = peticion.getPort();
+						byte[] sendData = new byte[1024];
+						sendData = response.getBytes();
+						DatagramPacket sendPacket = new DatagramPacket(
+								sendData,
+							 	sendData.length,
+							 	IPAddress, 
+								port);
+						aux.socket.send(sendPacket);
+					} catch (Exception e){
+					}
 				}
-
 			}
-
 			else{
 				System.out.println("No hay clientes solicitando conexión");
 			}
 		}
 
+
+
 		public void recibirMensajes()  throws UnknownHostException, InterruptedException {
-				String INET_ADDR = "224.0.0.3";
-				int PORT = 8888; // escucha el puerto 8888
+				String INET_ADDR = "224.0.0.3"; //multicast
+				int PORT = 8886; // escucha el puerto 8888
         			InetAddress address = InetAddress.getByName(INET_ADDR);
-
-        			//try (MulticastSocket clientSocket = new MulticastSocket(PORT)){
-            //				clientSocket.joinGroup(address);
 								try{
-									//DatagramSocket clientSocket = new DatagramSocket(PORT);
-									clientSocket = new MulticastSocket(PORT);
-            			clientSocket.joinGroup(address);
-									 byte[] buf = new byte[256];
-            				while (true) {
-                			   DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
-                			   clientSocket.receive(msgPacket);
-												System.out.println("Conexión de cliente entrante de Ip "+msgPacket.getAddress());
-												 //client_requesting = true;
-												//synchronized (lock) {
-
-													 String msg= new String(msgPacket.getData(),msgPacket.getOffset(), msgPacket.getLength());
-													 msg = new String(buf, 0, buf.length);
-													 // debo recibir del Mensajes la IP y el Distrito
-													 // buscar Distrito X en lsita de dsitritos
-													 String nombre = "";
-													 //Thread.sleep(5000);
-
-														 System.out.println("Esperando lock");
-													//lock.wait();
-													 //int numero_distrito = buscarDistrito(nombre);
-													// if(numero_distrito > 0){
-														clienteEntrante aux = new clienteEntrante(msgPacket.getAddress(),
-																msg, msgPacket, clientSocket);
-														clientes.add(aux);
-
-														 //System.out.println("Dar autorizacion a /IP: por Distrito X");
-														 //System.out.println("6.- SI");
-														 //System.out.println("7.- NO");
-
-														 //String res = in2.nextLine();
-														 //user_input = in2.nextLine();
-														 //String res = user_input;
-														 System.out.println("Waiting option");
-														String option = waitInput();
-
-														 System.out.println("option recived!");
-														 //user_input = "";
-														 System.out.println("res dice: "+option);
-														 client_requesting = false;
-														 //lock.notify();
-														 System.out.println("Coloque opción nueva del menú");
-
-												//	}
-
-                      //   }
-
-            				}
+											DatagramSocket serverSocket = new DatagramSocket(PORT);
+											byte[] receiveData = new byte[1024];
+											while(true)
+												 {
+														DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+														serverSocket.receive(receivePacket);
+														String[] sentence = new String(receivePacket.getData(), receivePacket.getOffset(), receivePacket.getLength()).split("-");
+														if(sentence[0].equals("0")){
+															//Cliente
+																System.out.println("Cliente conectandose!");
+																clienteEntrante aux = new clienteEntrante(receivePacket.getAddress(),
+																		sentence[1], receivePacket, serverSocket);
+																clientes.add(aux);
+																System.out.println("añadido de cliente a lista exitoso");
+														}
+														else {
+															//Servidor distrito
+															byte[] sendData = new byte[1024];
+															System.out.println("hola, ID titan = "+ID_titan);
+															InetAddress IPAddress = receivePacket.getAddress();
+															int port = receivePacket.getPort();
+															sendData = String.valueOf(ID_titan).getBytes();
+															DatagramPacket sendPacket =
+																new DatagramPacket(sendData, sendData.length, IPAddress, port);
+															serverSocket.send(sendPacket);
+															ID_titan++;
+														}
+												 }
         			} catch (IOException ex) {
             		              ex.printStackTrace();
         	                }

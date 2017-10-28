@@ -43,6 +43,9 @@ public class serv_distrito {
 			Scanner in = new Scanner(System.in);
 			System.out.println("Ingrese nombre del Distrito:");
 			nombre = in.nextLine();
+			System.out.println("Ingrese puerto Unicast (diferente para los distritos de misma ip:");
+			String puerto_ucast = in.nextLine();
+			PORT_UCAST = Integer.parseInt(puerto_ucast);
 
 			thread1 = new Thread() {
 				public void run() {
@@ -175,7 +178,7 @@ public class serv_distrito {
 
 		public void agregarTitan(Scanner in) throws UnknownHostException, InterruptedException{
 			int tipo_titan;
-			int id_titan = 0;
+			int id_titan = getTitanID();
 			String name_titan;
 
 			in.nextLine();
@@ -190,12 +193,11 @@ public class serv_distrito {
 			in.nextLine();
 			//Agregar el Titan a la base de datos, con las variables anteriores para obtener el ID
 			System.out.println("************");
-			System.out.println("ID: "+curr_id);
+			System.out.println("ID: "+id_titan);
 			System.out.println("Nombre: "+name_titan+"");
 			System.out.println("Tipo: "+tipo_titan+"");
 			System.out.println("************");
 
-			id_titan = curr_id;
 			Titan titan = new Titan(id_titan, name_titan, tipo_titan, 0);
 			titanes.add(titan);
 			curr_id++;
@@ -300,7 +302,6 @@ public class serv_distrito {
 
 
 		public void sendMessage(String msg) throws UnknownHostException, InterruptedException{
-
 			InetAddress addr = InetAddress.getByName(INET_ADDR);
 			try (DatagramSocket serverSocket = new DatagramSocket()) {
 					DatagramPacket msgPacket = new DatagramPacket(msg.getBytes(),
@@ -310,6 +311,29 @@ public class serv_distrito {
 			} catch (IOException ex) {
 					ex.printStackTrace();
 			}
+		}
+
+
+		public int getTitanID(){
+			String modifiedSentence;
+			try{
+				DatagramSocket clientSocket = new DatagramSocket();
+				InetAddress IPAddress = InetAddress.getByName("localhost");
+				byte[] sendData = new byte[1024];
+				byte[] receiveData = new byte[1024];
+				int PORT_UCAST = 8886;
+				String s = "1";
+				sendData = s.getBytes();
+				DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, PORT_UCAST);
+				clientSocket.send(sendPacket);
+				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+				System.out.println("Esperando ID del servidor central...");
+				clientSocket.receive(receivePacket);
+				modifiedSentence = new String(receivePacket.getData(), receivePacket.getOffset(), receivePacket.getLength());
+				System.out.println(modifiedSentence);
+				clientSocket.close();
+			} catch (Exception e) { return 9999; }
+				return Integer.parseInt(modifiedSentence);
 		}
 
 

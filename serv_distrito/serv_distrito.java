@@ -8,9 +8,7 @@ import java.util.ArrayList;
 
 
 public class serv_distrito {
-    
 
-		public static String nombre = "";
 		public String INET_ADDR = "224.0.0.3";
 		public int PORT = 8888;
 		public int PORT_UCAST = 8887;
@@ -142,12 +140,12 @@ public class serv_distrito {
 				*/
 
 			while(menu){
-				System.out.println("[Distrito "+nombre+"] Elegir Opción:");
-				System.out.println("[Distrito "+nombre+"] 1) Agregar Distrito");
-				System.out.println("[Distrito "+nombre+"] 2) Agregar Titan");
-				System.out.println("[Distrito "+nombre+"] 3) Enviar Mensajes a Clientes (no se usa)");
-				System.out.println("[Distrito "+nombre+"] 4) Imprimir Titanes");
-				System.out.println("[Distrito "+nombre+"] 5) Salir");
+				System.out.println("[Distrito "+NOMBRE+"] Elegir Opción:");
+				System.out.println("[Distrito "+NOMBRE+"] 1) Agregar Distrito");
+				System.out.println("[Distrito "+NOMBRE+"] 2) Agregar Titan");
+				System.out.println("[Distrito "+NOMBRE+"] 3) Enviar Mensajes a Clientes (no se usa)");
+				System.out.println("[Distrito "+NOMBRE+"] 4) Imprimir Titanes");
+				System.out.println("[Distrito "+NOMBRE+"] 5) Salir");
 				choose = in.nextInt();
 
 				if(choose == 1){
@@ -210,10 +208,10 @@ public class serv_distrito {
 			String name_titan;
 
 			in.nextLine();
-			System.out.println("[Distrito "+nombre+"] Publicar Titan");
-			System.out.println("[Distrito "+nombre+"] Introducir nombre");
+			System.out.println("[Distrito "+NOMBRE+"] Publicar Titan");
+			System.out.println("[Distrito "+NOMBRE+"] Introducir nombre");
 			name_titan = in.nextLine();
-			System.out.println("[Distrito "+nombre+"] Introducir tipo");
+			System.out.println("[Distrito "+NOMBRE+"] Introducir tipo");
 			System.out.println("1.- Normal");
 			System.out.println("2.- Excentrico");
 			System.out.println("3.- Cambiante");

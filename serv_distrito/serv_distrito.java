@@ -127,10 +127,10 @@ public class serv_distrito {
 			menu(in);
 		}
 
-		
+
 		public void menu(Scanner in) throws UnknownHostException, InterruptedException{
 			boolean menu = true;
-			int choose = 0; 
+			int choose = 0;
 			//Opciones de Inicialicación de Servidor
 			/*
 			System.out.println("Ingrese el Puerto del Servidor");
@@ -181,7 +181,7 @@ public class serv_distrito {
 
 			System.out.println("[Distrito "+input_consola+"] IP Multicast:");
 			ip_multicast = in.nextLine();
-			
+
 			System.out.println("[Distrito "+input_consola+"] Puerto Multicast:");
 			p_multicast = in.nextInt();
 			in.nextLine();
@@ -227,7 +227,7 @@ public class serv_distrito {
 			Titan titan = new Titan(id_titan, name_titan, tipo_titan, 0);
 			titanes.add(titan);
 			curr_id++;
-			String msg = "Aparece nuevo Titan! "+name_titan+", tipo "+tipo_titan+", ID: "+id_titan+""; 
+			String msg = "Aparece nuevo Titan! "+name_titan+", tipo "+tipo_titan+", ID: "+id_titan+"";
 			sendMessage(msg);
 		}
 
@@ -306,7 +306,7 @@ public class serv_distrito {
 					aux = titanes.get(i);
 					if (aux.ID == id_titan && aux.Estado == 0){
 						aux.Estado = accion;
-						return "Titan "+aux.Name+" manipulado con "+accion+", con id="+aux.ID+"; "; 
+						return "Titan "+aux.Name+" manipulado con "+accion+", con id="+aux.ID+"; ";
 					}
 				}
 				System.out.println("Titan no disponible (ya capturado, asesinado, o no pertenece a distrito)");

@@ -28,10 +28,8 @@ public class cliente {
 			new cliente();
     }
 
-
-		public cliente() throws UnknownHostException, Exception {
-
-			Thread thread1 = new Thread() {
+		public void startThread(){
+			thread1 = new Thread() {
 				@Override
 				public void run() {
 						try{
@@ -46,7 +44,6 @@ public class cliente {
 											clientSocket.receive(msgPacket);
 
 											String msg = new String(buf, 0, buf.length);
-											System.out.println(msg);
 									}
 									System.out.println("Se acabo el loop :)");
 							} catch (IOException ex) {
@@ -58,37 +55,50 @@ public class cliente {
 						}
 				}
 			};
+		}
+
+		public void AskServCentral(Scanner in){
+			System.out.println("Ingrese nombre de Distrito a Investigar");
+			String distrito_selec = in.nextLine();
+
+			String in_msg = "0-"+distrito_selec;
+			System.out.println("Esperando respuesta del servidor central...");
+			try{
+				String data_distrito = sendUnicastMsg(in_msg, 0);
+				if(!(data_distrito.equals(""))){
+					System.out.println("antes del split");
+					String[] data = data_distrito.split("-");
+					System.out.println("despues del split");
+					DIST_NOMBRE = data[0];  //nombre
+					DIST_IPMULT = data[1];  //ip multicast
+					DIST_PMULT = Integer.parseInt(data[2]);  //puerto multicast
+					DIST_IPPETIC = data[3];  //ip peticiones (ip en la red del servidor de distrito)
+					DIST_PPETIC = Integer.parseInt(data[4]);  // puerto peticiones
+				}
+				else{
+					System.out.println("Conexión Erronea, no se encontro el distrito. Vuelva a iniciar programa.");
+					System.exit(0);
+				}
+
+			} catch (Exception e) {}
+		}
+
+
+		public cliente() throws UnknownHostException, Exception {
+
+			startThread();
 
 			Scanner in = new Scanner(System.in);
 			System.out.println("Ingresar IP del Servidor Central");
 			INET_ADDR_SCENTRAL = in.nextLine();
 			System.out.println("Ingrese Puerto de peticiones Servidor Central");
 			String puerto_central = in.nextLine();
-			System.out.println("Ingrese nombre de Distrito a Investigar");
-			String distrito_selec = in.nextLine();
 			if (puerto_central != "")
 				PORT_SERVCENTRAL = Integer.parseInt(puerto_central);
 
-			String in_msg = "0-"+distrito_selec;
-			System.out.println("Esperando respuesta del servidor central...");
-			String data_distrito = sendUnicastMsg(in_msg, 0);
-			if(!(data_distrito.equals(""))){
-				System.out.println("antes del split");
-				String[] data = data_distrito.split("-");
-				System.out.println("despues del split");
-				DIST_NOMBRE = data[0];  //nombre
-				DIST_IPMULT = data[1];  //ip multicast
-				DIST_PMULT = Integer.parseInt(data[2]);  //puerto multicast
-				DIST_IPPETIC = data[3];  //ip peticiones (ip en la red del servidor de distrito)
-				DIST_PPETIC = Integer.parseInt(data[4]);  // puerto peticiones
-				thread1.start();
-			}
-			else{
-				System.out.println("Conexión Erronea");
-        System.exit(0);
-			}
+			AskServCentral(in);
 
-
+			thread1.start();
 			menu(in);
 		}
 
@@ -130,9 +140,8 @@ public class cliente {
 
 		public void menu(Scanner in) throws UnknownHostException, Exception {
 			boolean menu = true;
-			int choose = 0, titan_id;
-
-			//
+			String choose = "0";
+		 	int titan_id;
 
 			while(menu){
 				System.out.println("Consola");
@@ -142,52 +151,47 @@ public class cliente {
 				System.out.println("(4) Asesinar Titan");
 				System.out.println("(5) Listar Titanes Capturados");
 				System.out.println("(6) Listar Titanes Asesinados");
-				System.out.println("Elegir Opción:");
-				System.out.println("7) Conectar con Servidor Central");
-				System.out.println("8) Recibir Mensajes (no usada ahora)");
-				System.out.println("9) Salir");
-				choose = in.nextInt();
+				System.out.println("(7) Salir");
+				choose = in.nextLine();
 
-				if(choose == 1){
+				if(choose.equals("1")){
 					String in_msg = "1";
 					sendUnicastMsg(in_msg, 1);
 				}
-				else if(choose == 2){
+				else if(choose.equals("2")){
+					//System.exit(5);
 					String in_msg = "2";
-					sendUnicastMsg(in_msg, 1);
+					thread1.interrupt(); // tell the thread to stop
+					System.out.println("Interrupting Thread");
+					//thread1.join();
+					System.out.println("thread stopped oin menu");
+					//sendUnicastMsg(in_msg, 1);
+					AskServCentral(in);
+					startThread();
 				}
-				else if(choose == 3){
+				else if(choose.equals("3")){
 					System.out.println("Ingrese el ID del titan a capturar");
 					titan_id = in.nextInt();
 					in.nextLine();
 					String in_msg = "3-"+titan_id;
 					sendUnicastMsg(in_msg, 1);
 				}
-				else if(choose == 4){
+				else if(choose.equals("4")){
 					System.out.println("Ingrese el ID del titan a asesinar");
 					titan_id = in.nextInt();
 					in.nextLine();
 					String in_msg = "4-"+titan_id;
 					sendUnicastMsg(in_msg, 1);
 				}
-				else if(choose == 5){
+				else if(choose.equals("5")){
 					String in_msg = "5";
 					sendUnicastMsg(in_msg, 1);
 				}
-				else if(choose == 6){
+				else if(choose.equals("6")){
 					String in_msg = "6";
 					sendUnicastMsg(in_msg, 1);
 				}
-				else if(choose == 7){
-					// ConectarServCentral(in);
-					String in_msg = "0-trost";
-					sendUnicastMsg(in_msg, 0);
-
-				}
-				else if(choose == 8){
-					//recibirMensajes();
-				}
-				else if(choose == 9){
+				else if(choose.equals("7")){
 					menu = false;
 				}
 				else{

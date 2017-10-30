@@ -18,6 +18,15 @@ public class serv_distrito {
 		public ArrayList<Titan> titanes = new ArrayList<Titan>();
 		public int curr_id = 0;
 
+		public String NOMBRE = "";
+		public String IP_MULTICAST = "";
+		public int P_MULTICAST = 0;
+		public String IP_SERVER = "";
+		public int P_SERVER = 0;
+
+		public String IP_SCENTRAL = "";
+		public int P_SCENTRAL = 0;
+
 
     public static void main(String[] args) throws UnknownHostException, InterruptedException {
 			new serv_distrito();
@@ -41,27 +50,44 @@ public class serv_distrito {
 
 		public serv_distrito() throws UnknownHostException, InterruptedException {
 			Scanner in = new Scanner(System.in);
+			String aux = "";
 			System.out.println("Ingrese nombre del Distrito:");
-			nombre = in.nextLine();
-			System.out.println("Ingrese puerto Unicast (diferente para los distritos de misma ip:");
-			String puerto_ucast = in.nextLine();
-			PORT_UCAST = Integer.parseInt(puerto_ucast);
+			NOMBRE = in.nextLine();
+
+			System.out.println("Ingresar IP Multicast");
+			IP_MULTICAST = in.nextLine();
+
+			System.out.println("Ingrese puerto Multicast:");
+			aux = in.nextLine();
+			P_MULTICAST =  Integer.parseInt(aux);
+
+			System.out.println("IP de Peiticones:");
+			IP_SERVER = in.nextLine();
+
+			System.out.println("Puerto de peticiones:");
+			aux = in.nextLine();
+			P_SERVER = Integer.parseInt(aux);
+
+			System.out.println("IP de Servidor Central:");
+			IP_SCENTRAL = in.nextLine();
+
+			System.out.println("Puerto de peticiones Servidor Central:");
+			aux = in.nextLine();
+			P_SCENTRAL = Integer.parseInt(aux);
+
+			//PORT_UCAST = Integer.parseInt(puerto_ucast);
 
 			thread1 = new Thread() {
 				public void run() {
 						try {
-							//InetAddress address = InetAddress.getByName(INET_ADDR);
-								//System.out.println("recibiendo mensajes unicast en "+PORT_UCAST);
-							  DatagramSocket serverSocket = new DatagramSocket(PORT_UCAST);
+							  DatagramSocket serverSocket = new DatagramSocket(P_SERVER);
 								byte[] receiveData = new byte[256];
 								byte[] sendData = new byte[1024];
 								String stringResponse = "";
 								while(true) {
 											DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 											serverSocket.receive(receivePacket);
-											//String s= new String( receivePacket.getData());
 											String[] s = new String(receivePacket.getData(), receivePacket.getOffset(), receivePacket.getLength()).split("-");
-											//System.out.println("RECEIVED: " + s);
 											if(s[0].equals("1")){
 												stringResponse+="Lista de Titanes:";
 												stringResponse = imprimirTitanesCliente(0);
@@ -108,16 +134,18 @@ public class serv_distrito {
 			boolean menu = true;
 			int choose = 0; 
 			//Opciones de Inicialicación de Servidor
+			/*
 			System.out.println("Ingrese el Puerto del Servidor");
 			String puerto = in.nextLine();
 			if (puerto != "")
 				PORT = Integer.parseInt(puerto);
+				*/
 
 			while(menu){
 				System.out.println("[Distrito "+nombre+"] Elegir Opción:");
 				System.out.println("[Distrito "+nombre+"] 1) Agregar Distrito");
 				System.out.println("[Distrito "+nombre+"] 2) Agregar Titan");
-				System.out.println("[Distrito "+nombre+"] 3) Enviar Mensajes a Clientes");
+				System.out.println("[Distrito "+nombre+"] 3) Enviar Mensajes a Clientes (no se usa)");
 				System.out.println("[Distrito "+nombre+"] 4) Imprimir Titanes");
 				System.out.println("[Distrito "+nombre+"] 5) Salir");
 				choose = in.nextInt();
@@ -129,7 +157,7 @@ public class serv_distrito {
 					agregarTitan(in);
 				}
 				else if(choose == 3){
-					sendMessages();
+					/*sendMessages();*/
 				}
 				else if(choose == 4){
 					imprimirTitanes();
@@ -302,10 +330,10 @@ public class serv_distrito {
 
 
 		public void sendMessage(String msg) throws UnknownHostException, InterruptedException{
-			InetAddress addr = InetAddress.getByName(INET_ADDR);
+			InetAddress addr = InetAddress.getByName(IP_MULTICAST);
 			try (DatagramSocket serverSocket = new DatagramSocket()) {
 					DatagramPacket msgPacket = new DatagramPacket(msg.getBytes(),
-									msg.getBytes().length, addr, PORT);
+									msg.getBytes().length, addr, P_MULTICAST);
 					serverSocket.send(msgPacket);
 					//Thread.sleep(500);
 			} catch (IOException ex) {
@@ -318,13 +346,13 @@ public class serv_distrito {
 			String modifiedSentence;
 			try{
 				DatagramSocket clientSocket = new DatagramSocket();
-				InetAddress IPAddress = InetAddress.getByName("localhost");
+				InetAddress IPAddress = InetAddress.getByName(IP_SCENTRAL);
 				byte[] sendData = new byte[1024];
 				byte[] receiveData = new byte[1024];
-				int PORT_UCAST = 8886;
+				//int PORT_UCAST = 8886;
 				String s = "1";
 				sendData = s.getBytes();
-				DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, PORT_UCAST);
+				DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, P_SCENTRAL);
 				clientSocket.send(sendPacket);
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 				System.out.println("Esperando ID del servidor central...");
@@ -337,6 +365,7 @@ public class serv_distrito {
 		}
 
 
+		/*
 		public void sendMessages() throws UnknownHostException, InterruptedException{
 			InetAddress addr = InetAddress.getByName(INET_ADDR);
 			try (DatagramSocket serverSocket = new DatagramSocket()) {
@@ -352,6 +381,5 @@ public class serv_distrito {
 					ex.printStackTrace();
 			}
 		}
-
-
+		*/
 }

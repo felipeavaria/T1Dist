@@ -30,36 +30,8 @@ public class cliente {
 
 
 		public cliente() throws UnknownHostException, Exception {
-			Scanner in = new Scanner(System.in);
-			System.out.println("Ingresar IP del Servidor Central");
-			INET_ADDR_SCENTRAL = in.nextLine();
-			System.out.println("Ingrese Puerto de peticiones Servidor Central");
-			String puerto_central = in.nextLine();
-			System.out.println("Ingrese nombre de Distrito a Investigar");
-			String distrito_selec = in.nextLine();
-			if (puerto_central != "")
-				PORT_SERVCENTRAL = Integer.parseInt(puerto_central);
 
-			String in_msg = "0-"+distrito_selec;
-			System.out.println("Esperando respuesta del servidor central...");
-			String data_distrito = sendUnicastMsg(in_msg, 0);
-			if(data_distrito != null){
-				System.out.println("antes del split");
-				String[] data = data_distrito.split("-");
-				System.out.println("despues del split");
-				DIST_NOMBRE = data[0];  //nombre
-				DIST_IPMULT = data[1];  //ip multicast
-				DIST_PMULT = Integer.parseInt(data[2]);  //puerto multicast
-				DIST_IPPETIC = data[3];  //ip peticiones (ip en la red del servidor de distrito)
-				DIST_PPETIC = Integer.parseInt(data[4]);  // puerto peticiones
-				//thread1.start();
-			}
-			else{
-				System.out.println("Conexión Erronea");
-			}
-
-
-			thread1 = new Thread() {
+			Thread thread1 = new Thread() {
 				@Override
 				public void run() {
 						try{
@@ -86,6 +58,35 @@ public class cliente {
 						}
 				}
 			};
+
+			Scanner in = new Scanner(System.in);
+			System.out.println("Ingresar IP del Servidor Central");
+			INET_ADDR_SCENTRAL = in.nextLine();
+			System.out.println("Ingrese Puerto de peticiones Servidor Central");
+			String puerto_central = in.nextLine();
+			System.out.println("Ingrese nombre de Distrito a Investigar");
+			String distrito_selec = in.nextLine();
+			if (puerto_central != "")
+				PORT_SERVCENTRAL = Integer.parseInt(puerto_central);
+
+			String in_msg = "0-"+distrito_selec;
+			System.out.println("Esperando respuesta del servidor central...");
+			String data_distrito = sendUnicastMsg(in_msg, 0);
+			if(data_distrito != null){
+				System.out.println("antes del split");
+				String[] data = data_distrito.split("-");
+				System.out.println("despues del split");
+				DIST_NOMBRE = data[0];  //nombre
+				DIST_IPMULT = data[1];  //ip multicast
+				DIST_PMULT = Integer.parseInt(data[2]);  //puerto multicast
+				DIST_IPPETIC = data[3];  //ip peticiones (ip en la red del servidor de distrito)
+				DIST_PPETIC = Integer.parseInt(data[4]);  // puerto peticiones
+				thread1.start();
+			}
+			else{
+				System.out.println("Conexión Erronea");
+			}
+
 
 			menu(in);
 		}

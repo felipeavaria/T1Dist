@@ -59,7 +59,7 @@ public class serv_distrito {
 			aux = in.nextLine();
 			P_MULTICAST =  Integer.parseInt(aux);
 
-			System.out.println("IP de Peiticones:");
+			System.out.println("IP de peticiones:");
 			IP_SERVER = in.nextLine();
 
 			System.out.println("Puerto de peticiones:");

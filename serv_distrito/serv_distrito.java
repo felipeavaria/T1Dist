@@ -73,8 +73,6 @@ public class serv_distrito {
 			aux = in.nextLine();
 			P_SCENTRAL = Integer.parseInt(aux);
 
-			//PORT_UCAST = Integer.parseInt(puerto_ucast);
-
 			thread1 = new Thread() {
 				public void run() {
 						try {
@@ -131,13 +129,6 @@ public class serv_distrito {
 		public void menu(Scanner in) throws UnknownHostException, InterruptedException{
 			boolean menu = true;
 			int choose = 0; 
-			//Opciones de Inicialicación de Servidor
-			/*
-			System.out.println("Ingrese el Puerto del Servidor");
-			String puerto = in.nextLine();
-			if (puerto != "")
-				PORT = Integer.parseInt(puerto);
-				*/
 
 			while(menu){
 				System.out.println("[Distrito "+NOMBRE+"] Elegir Opción:");
@@ -155,7 +146,6 @@ public class serv_distrito {
 					agregarTitan(in);
 				}
 				else if(choose == 3){
-					/*sendMessages();*/
 				}
 				else if(choose == 4){
 					imprimirTitanes();
@@ -217,7 +207,6 @@ public class serv_distrito {
 			System.out.println("3.- Cambiante");
 			tipo_titan = in.nextInt();
 			in.nextLine();
-			//Agregar el Titan a la base de datos, con las variables anteriores para obtener el ID
 			System.out.println("************");
 			System.out.println("ID: "+id_titan);
 			System.out.println("Nombre: "+name_titan+"");
@@ -333,7 +322,6 @@ public class serv_distrito {
 					DatagramPacket msgPacket = new DatagramPacket(msg.getBytes(),
 									msg.getBytes().length, addr, P_MULTICAST);
 					serverSocket.send(msgPacket);
-					//Thread.sleep(500);
 			} catch (IOException ex) {
 					ex.printStackTrace();
 			}
@@ -347,7 +335,6 @@ public class serv_distrito {
 				InetAddress IPAddress = InetAddress.getByName(IP_SCENTRAL);
 				byte[] sendData = new byte[1024];
 				byte[] receiveData = new byte[1024];
-				//int PORT_UCAST = 8886;
 				String s = "1";
 				sendData = s.getBytes();
 				DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, P_SCENTRAL);
@@ -362,22 +349,4 @@ public class serv_distrito {
 				return Integer.parseInt(modifiedSentence);
 		}
 
-
-		/*
-		public void sendMessages() throws UnknownHostException, InterruptedException{
-			InetAddress addr = InetAddress.getByName(INET_ADDR);
-			try (DatagramSocket serverSocket = new DatagramSocket()) {
-					for (int i = 0; i < 5; i++) {
-							String msg = "Sent message no " + i;
-							DatagramPacket msgPacket = new DatagramPacket(msg.getBytes(),
-											msg.getBytes().length, addr, PORT);
-							serverSocket.send(msgPacket);
-							System.out.println("Server sent packet with msg: " + msg);
-							Thread.sleep(500);
-					}
-			} catch (IOException ex) {
-					ex.printStackTrace();
-			}
-		}
-		*/
 }

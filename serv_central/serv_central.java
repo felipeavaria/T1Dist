@@ -60,7 +60,7 @@ public class clienteEntrante{
 
 		public serv_central() throws UnknownHostException, InterruptedException {
 			Scanner in = new Scanner(System.in);
-			System.out.println("ingrese el puerto de que escucha el servidor central");
+			System.out.println("\033[37mIngrese el puerto de que escucha el servidor central");
 			Puerto_escucha = in.nextInt();
 
 			Thread hiloA = new Thread(){
@@ -315,9 +315,9 @@ public class clienteEntrante{
 																	clienteEntrante aux = new clienteEntrante(receivePacket.getAddress(),
 																			sentence[1], receivePacket, serverSocket);
 																	clientes.add(aux);
-																	System.out.println(">> Cliente añadido a la lista de pendientes");
+																	System.out.println("\033[31m>> Cliente añadido a la lista de pendientes\033[37m");
 																}else{
-																	System.out.println(">> Cliente NO añadido a la lista de pendientes, distrito consultado no existe");
+																	System.out.println("\033[31m>> Cliente NO añadido a la lista de pendientes, distrito consultado no existe\033[37m");
 																	String response = "";;
 																	InetAddress IPAddress = receivePacket.getAddress();
 																	int port = receivePacket.getPort();
@@ -338,7 +338,7 @@ public class clienteEntrante{
 														else {
 															//Servidor distrito
 															byte[] sendData = new byte[1024];
-															System.out.println(">> ID titan asignado : "+ID_titan);
+															System.out.println("\033[31m>> ID titan asignado : "+ID_titan+" \033[37m");
 															imprimirMenu();
 															InetAddress IPAddress = receivePacket.getAddress();
 															int port = receivePacket.getPort();

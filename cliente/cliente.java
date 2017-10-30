@@ -9,10 +9,18 @@ import java.util.Scanner;
 
 public class cliente {
 
+    
+		//public String INET_ADDR = "224.0.0.3";
+		public String INET_ADDR_SCENTRAL = "";
+		public int PORT_SERVCENTRAL = 8886;
+		public int PORT_SERVDISTRITO = 8887;
 
-		public String INET_ADDR = "224.0.0.3";
-		public int PORT = 8888;
-		//public int PORT_UCAST = 8887;
+		public String DIST_NOMBRE = "";
+		public String DIST_IPMULT = "";
+		public int DIST_PMULT = 8887;
+		public String DIST_IPPETIC = "";
+		public int DIST_PPETIC = 8887;
+
 		public Thread thread1;
 
 
@@ -23,19 +31,42 @@ public class cliente {
 
 		public cliente() throws UnknownHostException, Exception {
 			Scanner in = new Scanner(System.in);
-			System.out.println("Ingrese el Puerto a Escuchar");
-			String puerto = in.nextLine();
-			if (puerto != "")
-				PORT = Integer.parseInt(puerto);
+			System.out.println("Ingresar IP del Servidor Central");
+			INET_ADDR_SCENTRAL = in.nextLine();
+			System.out.println("Ingrese Puerto de peticiones Servidor Central");
+			String puerto_central = in.nextLine();
+			System.out.println("Ingrese nombre de Distrito a Investigar");
+			String distrito_selec = in.nextLine();
+			if (puerto_central != "")
+				PORT_SERVCENTRAL = Integer.parseInt(puerto_central);
+
+			String in_msg = "0-"+distrito_selec;
+			System.out.println("Esperando respuesta del servidor central...");
+			String data_distrito = sendUnicastMsg(in_msg, 0);
+			if(data_distrito != null){
+				System.out.println("antes del split");
+				String[] data = data_distrito.split("-");
+				System.out.println("despues del split");
+				DIST_NOMBRE = data[0];  //nombre
+				DIST_IPMULT = data[1];  //ip multicast
+				DIST_PMULT = Integer.parseInt(data[2]);  //puerto multicast
+				DIST_IPPETIC = data[3];  //ip peticiones (ip en la red del servidor de distrito)
+				DIST_PPETIC = Integer.parseInt(data[4]);  // puerto peticiones
+				//thread1.start();
+			}
+			else{
+				System.out.println("Conexión Erronea");
+			}
+
 
 			thread1 = new Thread() {
 				@Override
 				public void run() {
 						try{
-							InetAddress address = InetAddress.getByName(INET_ADDR);
+							InetAddress address = InetAddress.getByName(DIST_IPMULT);
 							byte[] buf = new byte[256];
-
-							try (MulticastSocket clientSocket = new MulticastSocket(PORT)){
+							
+							try (MulticastSocket clientSocket = new MulticastSocket(DIST_PMULT)){
 									clientSocket.joinGroup(address);
 
 									while (!this.isInterrupted()) {
@@ -60,36 +91,38 @@ public class cliente {
 		}
 
 
-		 public void sendUnicastMsg(String s, int target) throws Exception {
-				//BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-				//System.out.println("Sending Unicast Message to Port "+PORT_UCAST);
+		 public String sendUnicastMsg(String s, int target) throws Exception {
 				DatagramSocket clientSocket = new DatagramSocket();
-				InetAddress IPAddress = InetAddress.getByName("localhost");//"10.6.43.206");
+				String INET_ADDR = "";
+				int PORT = 0;
+
+				if(target == 0){
+					INET_ADDR = INET_ADDR_SCENTRAL;
+					PORT = PORT_SERVCENTRAL;
+				}
+				else {
+					INET_ADDR = DIST_IPPETIC; 
+					PORT = DIST_PPETIC;
+				}
+
+				InetAddress IPAddress = InetAddress.getByName(INET_ADDR);
 				byte[] sendData = new byte[1024];
 				byte[] receiveData = new byte[1024];
-				int PORT_UCAST;
-				//String sentence = inFromUser.readLine();
 				sendData = s.getBytes();
 
 				// Aqui abrire la lógica, para enviar:
 				// serv_central: pedir conexión a distrito, y obtener info
 				// serv_distrito: acciones a un titan
-				if(target == 0){
-					PORT_UCAST = 8886;
-				}
-				else {
-					PORT_UCAST = 8887;
-				}
-				// Fin bloque seleccion de ida de mensaje
 
-				DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, PORT_UCAST);
+				DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, PORT);
 				clientSocket.send(sendPacket);
 				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-				System.out.println("Esperando respuesta del servidor central...");
 				clientSocket.receive(receivePacket);
-				String modifiedSentence = new String(receivePacket.getData());
+				String modifiedSentence = new String(receivePacket.getData(), receivePacket.getOffset(), receivePacket.getLength());
 				System.out.println(modifiedSentence);
 				clientSocket.close();
+
+				return modifiedSentence;
 		 }
 
 
@@ -97,7 +130,7 @@ public class cliente {
 			boolean menu = true;
 			int choose = 0, titan_id;
 
-			thread1.start();
+			//
 
 			while(menu){
 				System.out.println("Consola");
@@ -109,7 +142,7 @@ public class cliente {
 				System.out.println("(6) Listar Titanes Asesinados");
 				System.out.println("Elegir Opción:");
 				System.out.println("7) Conectar con Servidor Central");
-				System.out.println("8) Recibir Mensajes");
+				System.out.println("8) Recibir Mensajes (no usada ahora)");
 				System.out.println("9) Salir");
 				choose = in.nextInt();
 
@@ -150,7 +183,7 @@ public class cliente {
 
 				}
 				else if(choose == 8){
-					recibirMensajes();
+					//recibirMensajes();
 				}
 				else if(choose == 9){
 					menu = false;
@@ -197,6 +230,7 @@ public class cliente {
 		}
 
 
+		/*
 		public void recibirMensajes()  throws UnknownHostException {
         InetAddress address = InetAddress.getByName(INET_ADDR);
 				boolean while_ = true;
@@ -219,6 +253,7 @@ public class cliente {
             ex.printStackTrace();
         }
 		}
+		*/
 
 
 	public static void ConectarServCentral(Scanner in) throws UnknownHostException, InterruptedException{

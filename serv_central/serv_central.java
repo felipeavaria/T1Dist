@@ -60,7 +60,7 @@ public class clienteEntrante{
 
 		public serv_central() throws UnknownHostException, InterruptedException {
 			Scanner in = new Scanner(System.in);
-			System.out.println("ingrese el puerto de que escucha el servidor central");
+			System.out.println("\033[37mIngrese el puerto de que escucha el servidor central");
 			Puerto_escucha = in.nextInt();
 
 			Thread hiloA = new Thread(){
@@ -134,17 +134,16 @@ public class clienteEntrante{
 				System.out.println("Elegir Opción:");
 				System.out.println("1) Agregar Distrito");
         System.out.println("2) Ver lista de Distritos");
-				System.out.println("3) Enviar Mensajes a Clientes");
-				System.out.println("4) Permitir conexión a cleintes pendientes ("+clientes.size()+")");
-				System.out.println("5) Salir");
+				System.out.println("3) Permitir conexión a cleintes pendientes ("+clientes.size()+")");
+
 
 
 					String user_input = waitInput();
-					System.out.println("String recieved!");
+
 
 
 					if(user_input.equals("1")){
-						System.out.println("opcion 1");
+						//System.out.println("opcion 1");
 						agregarDistrito();
 
 					}
@@ -152,9 +151,6 @@ public class clienteEntrante{
 						mostrarDistritos();
 					}
 					else if(user_input.equals("3")){
-						//sendMessages();
-					}
-					else if(user_input.equals("4")){
 						//hiloA.stop();
 						/*
 						lock.notify();
@@ -163,20 +159,6 @@ public class clienteEntrante{
 						*/
 						aceptarClientes();
 					}
-					else if(user_input.equals("5")){
-						//hiloA.stop();
-						menu = false;
-					}
-					else if(user_input == "5"){
-					}
-					else if(user_input == "6"){
-						System.out.println("Rechazando solicitud conexion");
-					}
-					else{
-						System.out.println("Opcion no reconocida. Elegir otra opción");
-					}
-
-				//}
 			}
 		}
 
@@ -305,12 +287,19 @@ public class clienteEntrante{
 			}
 		}
 
+		public void imprimirMenu()throws InterruptedException {
+			Thread.sleep(1000);
+			System.out.println("Elegir Opción:");
+			System.out.println("1) Agregar Distrito");
+			System.out.println("2) Ver lista de Distritos");
+			System.out.println("3) Permitir conexión a cleintes pendientes ("+clientes.size()+")");
+		}
 
 
 		public void recibirMensajes()  throws UnknownHostException, InterruptedException {
-				String INET_ADDR = "224.0.0.3"; //multicast
-				int PORT = 8886; // escucha el puerto 8888
-        			InetAddress address = InetAddress.getByName(INET_ADDR);
+				//String INET_ADDR = "224.0.0.3"; //multicast
+				int PORT = Puerto_escucha; // escucha el puerto 8888
+        			//InetAddress address = InetAddress.getByName(INET_ADDR);
 								try{
 											DatagramSocket serverSocket = new DatagramSocket(PORT);
 											byte[] receiveData = new byte[1024];
@@ -326,9 +315,9 @@ public class clienteEntrante{
 																	clienteEntrante aux = new clienteEntrante(receivePacket.getAddress(),
 																			sentence[1], receivePacket, serverSocket);
 																	clientes.add(aux);
-																	System.out.println("añadido de cliente a lista pendientes");
+																	System.out.println("\033[31m>> Cliente añadido a la lista de pendientes\033[37m");
 																}else{
-																	System.out.println("Cliente NO añadido a la lista de pendientes, vuelva a intentarlo");
+																	System.out.println("\033[31m>> Cliente NO añadido a la lista de pendientes, distrito consultado no existe\033[37m");
 																	String response = "";;
 																	InetAddress IPAddress = receivePacket.getAddress();
 																	int port = receivePacket.getPort();
@@ -343,11 +332,14 @@ public class clienteEntrante{
 
 																}
 
+																imprimirMenu();
+
 														}
 														else {
 															//Servidor distrito
 															byte[] sendData = new byte[1024];
-															System.out.println("hola, ID titan = "+ID_titan);
+															System.out.println("\033[31m>> ID titan asignado : "+ID_titan+" \033[37m");
+															imprimirMenu();
 															InetAddress IPAddress = receivePacket.getAddress();
 															int port = receivePacket.getPort();
 															sendData = String.valueOf(ID_titan).getBytes();

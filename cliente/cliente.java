@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class cliente {
 
-    
+
 		//public String INET_ADDR = "224.0.0.3";
 		public String INET_ADDR_SCENTRAL = "";
 		public int PORT_SERVCENTRAL = 8886;
@@ -37,7 +37,7 @@ public class cliente {
 						try{
 							InetAddress address = InetAddress.getByName(DIST_IPMULT);
 							byte[] buf = new byte[256];
-							
+
 							try (MulticastSocket clientSocket = new MulticastSocket(DIST_PMULT)){
 									clientSocket.joinGroup(address);
 
@@ -72,7 +72,7 @@ public class cliente {
 			String in_msg = "0-"+distrito_selec;
 			System.out.println("Esperando respuesta del servidor central...");
 			String data_distrito = sendUnicastMsg(in_msg, 0);
-			if(data_distrito != null){
+			if(!(data_distrito.equals(""))){
 				System.out.println("antes del split");
 				String[] data = data_distrito.split("-");
 				System.out.println("despues del split");
@@ -85,6 +85,7 @@ public class cliente {
 			}
 			else{
 				System.out.println("Conexión Erronea");
+        System.exit(0);
 			}
 
 
@@ -102,7 +103,7 @@ public class cliente {
 					PORT = PORT_SERVCENTRAL;
 				}
 				else {
-					INET_ADDR = DIST_IPPETIC; 
+					INET_ADDR = DIST_IPPETIC;
 					PORT = DIST_PPETIC;
 				}
 

@@ -329,7 +329,18 @@ public class clienteEntrante{
 																	System.out.println("añadido de cliente a lista pendientes");
 																}else{
 																	System.out.println("Cliente NO añadido a la lista de pendientes, vuelva a intentarlo");
-																	// responder al cleinte.
+																	String response = "";;
+																	InetAddress IPAddress = receivePacket.getAddress();
+																	int port = receivePacket.getPort();
+																	byte[] sendData = new byte[1024];
+																	sendData = response.getBytes();
+																	DatagramPacket sendPacket = new DatagramPacket(
+																			sendData,
+																		 	sendData.length,
+																		 	IPAddress,
+																			port);
+																	serverSocket.send(sendPacket);
+
 																}
 
 														}

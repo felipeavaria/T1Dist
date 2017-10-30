@@ -49,7 +49,7 @@ public class serv_distrito {
 		public serv_distrito() throws UnknownHostException, InterruptedException {
 			Scanner in = new Scanner(System.in);
 			String aux = "";
-			System.out.println("Ingrese nombre del Distrito:");
+			System.out.println("\033[34mIngrese nombre del Distrito:");
 			NOMBRE = in.nextLine();
 
 			System.out.println("Ingresar IP Multicast");
@@ -128,7 +128,7 @@ public class serv_distrito {
 
 		public void menu(Scanner in) throws UnknownHostException, InterruptedException{
 			boolean menu = true;
-<<<<<<< HEAD
+
 			int choose = 0;
 			//Opciones de Inicialicación de Servidor
 			/*
@@ -137,9 +137,6 @@ public class serv_distrito {
 			if (puerto != "")
 				PORT = Integer.parseInt(puerto);
 				*/
-=======
-			int choose = 0; 
->>>>>>> fe2cc0ffb1b7e85eaa0808616d911f6a1800a4b8
 
 			while(menu){
 				System.out.println("[Distrito "+NOMBRE+"] Elegir Opción:");

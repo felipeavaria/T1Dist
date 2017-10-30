@@ -135,7 +135,7 @@ public class clienteEntrante{
 				System.out.println("1) Agregar Distrito");
         System.out.println("2) Ver lista de Distritos");
 				System.out.println("3) Enviar Mensajes a Clientes");
-				System.out.println("4) Permitir conexión de cliente");
+				System.out.println("4) Permitir conexión a cleintes pendientes ("+clientes.size()+")");
 				System.out.println("5) Salir");
 
 
@@ -186,7 +186,7 @@ public class clienteEntrante{
 			int a;
 			String nombre, ip_multicast, ip_peticiones;
 			String p_multicast, p_peticiones;
-
+			System.out.println("AGREGAR DISTRITO");
 			//in.nextLine();
 			System.out.println("Nombre Distrito:");
 			//nombre = in.nextLine();
@@ -210,20 +210,23 @@ public class clienteEntrante{
 
 			Distrito distrito = new Distrito(nombre,ip_multicast, p_multicast,ip_peticiones,p_peticiones);
 			distritos.add(distrito);
-			System.out.println("Se agregara el Distrito:");
+			System.out.println("**************");
+			System.out.println("Distrito agregado:");
       System.out.println("Nombre: "+ nombre);
       System.out.println("IP Multicast: "+ ip_multicast);
       System.out.println("Puerto Multicast: "+ p_multicast);
       System.out.println("IP Peticiones: "+ ip_peticiones);
       System.out.println("Puerto Peticiones: "+ p_peticiones);
+			System.out.println("**************");
 	    //intsertar Distrito
 
 
 			System.out.println("\n");
 		}
 
-    public void mostrarDistritos(){
+    public void mostrarDistritos() throws InterruptedException{
 			Distrito aux;
+			System.out.println("***********************************************");
 			System.out.println("Lista de dsitritos:");
 			if(distritos.size() == 0){
 					System.out.println("No se han registrado Distritos");
@@ -240,8 +243,8 @@ public class clienteEntrante{
 				}
 			}
 
-      System.out.println("Enter para volver al Menu");
-      //in.nextLine();
+      System.out.println("***********************************************");
+			Thread.sleep(1000);
     }
 
 
@@ -256,25 +259,31 @@ public class clienteEntrante{
 			}
 		}
 
-		public void aceptarClientes() {
+		public void aceptarClientes() throws InterruptedException {
 			if (clientes.size() > 0){
 
 				while(clientes.size() > 0){
 					try{
 					clienteEntrante aux = clientes.remove(0);
 					DatagramPacket peticion = aux.request;
+					// estructura del mensaje
 					 System.out.println("Dar autorizacion a /IP: "+aux.IP+" para Distrito "+aux.msg);
 					 System.out.println("1.- SI");
 					 System.out.println("2.- NO");
 					 String ans = waitInput();
 					 String response = "";
 						if (ans.equals("1")){
-							response = "Datos distrito: (Proximamente)";
+							Distrito datos = buscarDatosDistrito(aux.msg);
+							response = datos.Nombre+"-"+datos.ip_multicast+"-"+datos.p_multicast+"-"+datos.ip_peticiones+"-"+datos.p_peticiones;
+
+							//nombre?ip_multicast?
+
 							//Aqui falta poner los datos del distrito, que estan en el listado de distritos,
 							//para poder enviar la respuesta de servidor al cliente
 						}
 						else if(ans.equals("2")){
-							response = "Conexión rechazada al servidor";
+							response = null;
+							System.out.println("Conexión rechazada al servidor");
 						}
 						InetAddress IPAddress = peticion.getAddress();
 						int port = peticion.getPort();
@@ -283,7 +292,7 @@ public class clienteEntrante{
 						DatagramPacket sendPacket = new DatagramPacket(
 								sendData,
 							 	sendData.length,
-							 	IPAddress, 
+							 	IPAddress,
 								port);
 						aux.socket.send(sendPacket);
 					} catch (Exception e){
@@ -291,7 +300,8 @@ public class clienteEntrante{
 				}
 			}
 			else{
-				System.out.println("No hay clientes solicitando conexión");
+				System.out.println("No hay clientes solicitando conexión \n");
+				Thread.sleep(1000);
 			}
 		}
 
@@ -312,10 +322,16 @@ public class clienteEntrante{
 														if(sentence[0].equals("0")){
 															//Cliente
 																System.out.println("Cliente conectandose!");
-																clienteEntrante aux = new clienteEntrante(receivePacket.getAddress(),
-																		sentence[1], receivePacket, serverSocket);
-																clientes.add(aux);
-																System.out.println("añadido de cliente a lista exitoso");
+																if(buscarDistrito(sentence[1])){
+																	clienteEntrante aux = new clienteEntrante(receivePacket.getAddress(),
+																			sentence[1], receivePacket, serverSocket);
+																	clientes.add(aux);
+																	System.out.println("añadido de cliente a lista pendientes");
+																}else{
+																	System.out.println("Cliente NO añadido a la lista de pendientes, vuelva a intentarlo");
+																	// responder al cleinte.
+																}
+
 														}
 														else {
 															//Servidor distrito
@@ -347,7 +363,7 @@ public class clienteEntrante{
 		}
 
 
-      public static boolean buscarDistrito(String nombre, ArrayList<Distrito> distritos ){
+      public boolean buscarDistrito(String nombre){
 					Distrito aux;
 					boolean salida=false;
 					for(int i = 0; i<distritos.size(); i++){
@@ -359,4 +375,17 @@ public class clienteEntrante{
 					}
 					return salida;
       }
+
+			public Distrito buscarDatosDistrito(String nombre){
+					Distrito aux;
+					for(int i = 0; i<distritos.size(); i++){
+							aux = distritos.get(i);
+							if ( nombre.equals(aux.Nombre) ){
+								return aux;
+							}
+					}
+
+					return null;
+			}
+
 }

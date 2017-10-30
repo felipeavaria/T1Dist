@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class cliente {
 
-    
+
 		public String INET_ADDR = "224.0.0.3";
 		public int PORT = 8888;
 		//public int PORT_UCAST = 8887;
@@ -34,10 +34,10 @@ public class cliente {
 						try{
 							InetAddress address = InetAddress.getByName(INET_ADDR);
 							byte[] buf = new byte[256];
-							
+
 							try (MulticastSocket clientSocket = new MulticastSocket(PORT)){
 									clientSocket.joinGroup(address);
-					 
+
 									while (!this.isInterrupted()) {
 											DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
 											clientSocket.receive(msgPacket);
@@ -64,7 +64,7 @@ public class cliente {
 				//BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
 				//System.out.println("Sending Unicast Message to Port "+PORT_UCAST);
 				DatagramSocket clientSocket = new DatagramSocket();
-				InetAddress IPAddress = InetAddress.getByName("localhost");
+				InetAddress IPAddress = InetAddress.getByName("localhost");//"10.6.43.206");
 				byte[] sendData = new byte[1024];
 				byte[] receiveData = new byte[1024];
 				int PORT_UCAST;
@@ -95,7 +95,7 @@ public class cliente {
 
 		public void menu(Scanner in) throws UnknownHostException, Exception {
 			boolean menu = true;
-			int choose = 0, titan_id; 
+			int choose = 0, titan_id;
 
 			thread1.start();
 
@@ -159,7 +159,7 @@ public class cliente {
 					System.out.println("Opcion no reconocida. Elegir otra opción");
 				}
 			}
-			
+
 			System.out.println("Terminando App");
 			thread1.interrupt();
 		}
@@ -176,7 +176,7 @@ public class cliente {
 
 			System.out.println("IP Multicast:");
 			ip_multicast = in.nextLine();
-			
+
 			System.out.println("Puerto Multicast:");
 			p_multicast = in.nextInt();
 			in.nextLine();
@@ -201,7 +201,7 @@ public class cliente {
         InetAddress address = InetAddress.getByName(INET_ADDR);
 				boolean while_ = true;
         byte[] buf = new byte[256];
-        
+
         try (MulticastSocket clientSocket = new MulticastSocket(PORT)){
             clientSocket.joinGroup(address);
             while (while_) {

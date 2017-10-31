@@ -9,10 +9,11 @@ import java.util.ArrayList;
 
 public class serv_distrito {
 
-		public String INET_ADDR = "224.0.0.3";
-		public int PORT = 8888;
-		public int PORT_UCAST = 8887;
+		//public String INET_ADDR = "224.0.0.3";
+		//public int PORT = 8888;
+		//public int PORT_UCAST = 8887;
 		public Thread thread1;
+		public Thread thread2;
 		public ArrayList<Titan> titanes = new ArrayList<Titan>();
 		public int curr_id = 0;
 
@@ -59,7 +60,7 @@ public class serv_distrito {
 			aux = in.nextLine();
 			P_MULTICAST =  Integer.parseInt(aux);
 
-			System.out.println("IP de Peiticones:");
+			System.out.println("IP de peticiones:");
 			IP_SERVER = in.nextLine();
 
 			System.out.println("Puerto de peticiones:");
@@ -121,7 +122,21 @@ public class serv_distrito {
 						}
 				}
 			};
+			thread2 =new Thread(){
+				public void run(){
+					try{
+						while(true){
+							sendMessageEstado();
+							Thread.sleep(3000);
+						}
+					}	catch(Exception e){
+							 e.printStackTrace();
+						}
+
+				}
+			};
 			thread1.start();
+			thread2.start();
 			menu(in);
 		}
 
@@ -139,30 +154,21 @@ public class serv_distrito {
 				*/
 
 			while(menu){
+
 				System.out.println("[Distrito "+NOMBRE+"] Elegir Opción:");
-				System.out.println("[Distrito "+NOMBRE+"] 1) Agregar Distrito");
-				System.out.println("[Distrito "+NOMBRE+"] 2) Agregar Titan");
-				System.out.println("[Distrito "+NOMBRE+"] 3) Enviar Mensajes a Clientes (no se usa)");
-				System.out.println("[Distrito "+NOMBRE+"] 4) Imprimir Titanes");
-				System.out.println("[Distrito "+NOMBRE+"] 5) Salir");
+				System.out.println("[Distrito "+NOMBRE+"] 1) Agregar Titan");
+				System.out.println("[Distrito "+NOMBRE+"] 2) Imprimir lista de Titanes");
+
 				choose = in.nextInt();
 
-				if(choose == 1){
-					agregarDistrito(in);
-				}
-				else if(choose == 2){
+			  if(choose == 1){
 					agregarTitan(in);
 				}
-				else if(choose == 3){
-				}
-				else if(choose == 4){
+				else if(choose == 2){
 					imprimirTitanes();
 				}
-				else if(choose == 5){
-					menu = false;
-				}
 				else{
-					System.out.println("Opcion no reconocida. Elegir otra opción");
+					System.out.println("\033[31mOpcion no reconocida. Elegir otra opción \033[34m");
 				}
 			}
 		}
@@ -334,6 +340,21 @@ public class serv_distrito {
 					ex.printStackTrace();
 			}
 		}
+
+		public void sendMessageEstado() throws UnknownHostException, InterruptedException{
+					String msg = "";
+					InetAddress addr = InetAddress.getByName(IP_MULTICAST);
+					try (DatagramSocket serverSocket = new DatagramSocket()) {
+
+							DatagramPacket msgPacket = new DatagramPacket(msg.getBytes(),
+											msg.getBytes().length, addr, P_MULTICAST);
+							serverSocket.send(msgPacket);
+					} catch (IOException ex) {
+							ex.printStackTrace();
+					}
+			}
+
+
 
 
 		public int getTitanID(){

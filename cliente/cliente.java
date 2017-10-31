@@ -27,6 +27,8 @@ public class cliente {
 		//public Thread listenMulticast;
 		ExecutorService executorService = Executors.newFixedThreadPool(10);
 		boolean running = true;
+		public ArrayList<Titan> capturados = new ArrayList<Titan>();
+		public ArrayList<Titan> asesinados = new ArrayList<Titan>();
 
 
     public static void main(String[] args) throws UnknownHostException, Exception {
@@ -63,6 +65,21 @@ public class cliente {
 			return aux;
 		}
 
+
+		public class Titan {
+			int ID;
+			String Name;
+			int Estado, Tipo;
+			public Titan() {
+			}
+			public Titan(int ID_, String Name_, int Tipo_, int Estado_) {
+				this.ID = ID_;
+				this.Name = Name_;
+				this.Estado = Estado_;
+				this.Tipo = Tipo_;
+			}
+		}
+
 		public void AskServCentral(Scanner in){
 			System.out.println("Ingrese nombre de Distrito a Investigar");
 			String distrito_selec = in.nextLine();
@@ -85,6 +102,7 @@ public class cliente {
 				}
 
 			} catch (Exception e) {}
+
 		}
 
 
@@ -175,7 +193,7 @@ public class cliente {
 				System.out.println("(4) Asesinar Titan");
 				System.out.println("(5) Listar Titanes Capturados");
 				System.out.println("(6) Listar Titanes Asesinados");
-				System.out.println("(7) Salir");
+
 				choose = in.nextLine();
 
 				if(choose.equals("1")){
@@ -233,9 +251,7 @@ public class cliente {
 					String in_msg = "6";
 					sendUnicastMsg(in_msg, 1);
 				}
-				else if(choose.equals("7")){
-					menu = false;
-				}
+
 				else{
 					System.out.println("Opcion no reconocida. Elegir otra opción");
 				}

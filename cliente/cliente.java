@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.util.concurrent.*;
 
 
 public class cliente {
@@ -21,31 +22,32 @@ public class cliente {
 		public String DIST_IPPETIC = "";
 		public int DIST_PPETIC = 8887;
 
-		public Thread thread1;
+		public Thread listenMulticast;
+		ExecutorService executorService = Executors.newFixedThreadPool(10);
 
 
     public static void main(String[] args) throws UnknownHostException, Exception {
 			new cliente();
     }
 
-		public void startThread(){
-			thread1 = new Thread() {
+		public Thread startThread(){
+			Thread aux = new Thread() {
 				@Override
 				public void run() {
 						try{
 							InetAddress address = InetAddress.getByName(DIST_IPMULT);
-							byte[] buf = new byte[256];
 
 							try (MulticastSocket clientSocket = new MulticastSocket(DIST_PMULT)){
 									clientSocket.joinGroup(address);
 
 									while (!this.isInterrupted()) {
+											byte[] buf = new byte[256];
 											DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
 											clientSocket.receive(msgPacket);
-
-											String msg = new String(buf, 0, buf.length);
+											//String msg = new String(buf, 0, buf.length);
+											String msg = new String(msgPacket.getData(), msgPacket.getOffset(), msgPacket.getLength());
+											if(!(msg.equals(""))){ System.out.println(msg);}
 									}
-									System.out.println("Se acabo el loop :)");
 							} catch (IOException ex) {
 									ex.printStackTrace();
 							}
@@ -55,6 +57,7 @@ public class cliente {
 						}
 				}
 			};
+			return aux;
 		}
 
 		public void AskServCentral(Scanner in){
@@ -66,9 +69,7 @@ public class cliente {
 			try{
 				String data_distrito = sendUnicastMsg(in_msg, 0);
 				if(!(data_distrito.equals(""))){
-					System.out.println("antes del split");
 					String[] data = data_distrito.split("-");
-					System.out.println("despues del split");
 					DIST_NOMBRE = data[0];  //nombre
 					DIST_IPMULT = data[1];  //ip multicast
 					DIST_PMULT = Integer.parseInt(data[2]);  //puerto multicast
@@ -86,7 +87,7 @@ public class cliente {
 
 		public cliente() throws UnknownHostException, Exception {
 
-			startThread();
+			listenMulticast = startThread();
 
 			Scanner in = new Scanner(System.in);
 			System.out.println("Ingresar IP del Servidor Central");
@@ -98,7 +99,7 @@ public class cliente {
 
 			AskServCentral(in);
 
-			thread1.start();
+			listenMulticast.start();
 			menu(in);
 		}
 
@@ -161,13 +162,42 @@ public class cliente {
 				else if(choose.equals("2")){
 					//System.exit(5);
 					String in_msg = "2";
-					thread1.interrupt(); // tell the thread to stop
-					System.out.println("Interrupting Thread");
-					//thread1.join();
-					System.out.println("thread stopped oin menu");
+					listenMulticast.interrupt(); // tell the thread to stop
+					listenMulticast.join();
 					//sendUnicastMsg(in_msg, 1);
 					AskServCentral(in);
-					startThread();
+					listenMulticast.run();
+
+/*
+					listenMulticast = new Thread() {
+						@Override
+						public void run() {
+							System.out.println("** Running mutlicast thread; ip: "+DIST_IPMULT+"; puerto: "+DIST_PMULT); 
+								try{
+									InetAddress address = InetAddress.getByName(DIST_IPMULT);
+
+									try (MulticastSocket clientSocket = new MulticastSocket(DIST_PMULT)){
+											clientSocket.joinGroup(address);
+
+											while (!this.isInterrupted()) {
+													byte[] buf = new byte[256];
+													DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
+													clientSocket.receive(msgPacket);
+													//String msg = new String(buf, 0, buf.length);
+													String msg = new String(msgPacket.getData(), msgPacket.getOffset(), msgPacket.getLength());
+													if(!(msg.equals(""))){ System.out.println(msg);}
+											}
+											System.out.println("Se acabo el loop :)");
+									} catch (IOException ex) {
+											ex.printStackTrace();
+									}
+								}
+								catch(Exception e){
+									 e.printStackTrace();
+								}
+						}
+					};
+					*/
 				}
 				else if(choose.equals("3")){
 					System.out.println("Ingrese el ID del titan a capturar");
@@ -200,7 +230,7 @@ public class cliente {
 			}
 
 			System.out.println("Terminando App");
-			thread1.interrupt();
+			listenMulticast.interrupt();
 		}
 
 

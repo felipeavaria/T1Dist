@@ -6,6 +6,7 @@ import java.net.MulticastSocket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.concurrent.*;
+import java.util.ArrayList;
 
 
 public class cliente {
@@ -29,54 +30,27 @@ public class cliente {
 		boolean running = true;
 		public ArrayList<Titan> capturados = new ArrayList<Titan>();
 		public ArrayList<Titan> asesinados = new ArrayList<Titan>();
+		public int id_dist= 0;
 
 
     public static void main(String[] args) throws UnknownHostException, Exception {
 			new cliente();
     }
 
-		public Thread startThread(){
-			Thread aux = new Thread() {
-				@Override
-				public void run() {
-						try{
-							InetAddress address = InetAddress.getByName(DIST_IPMULT);
-
-							try (MulticastSocket clientSocket = new MulticastSocket(DIST_PMULT)){
-									clientSocket.joinGroup(address);
-
-									while (!this.isInterrupted()) {
-											byte[] buf = new byte[256];
-											DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
-											clientSocket.receive(msgPacket);
-											//String msg = new String(buf, 0, buf.length);
-											String msg = new String(msgPacket.getData(), msgPacket.getOffset(), msgPacket.getLength());
-											if(!(msg.equals(""))){ System.out.println(msg);}
-									}
-							} catch (IOException ex) {
-									ex.printStackTrace();
-							}
-						}
-						catch(Exception e){
-							 e.printStackTrace();
-						}
-				}
-			};
-			return aux;
-		}
-
-
 		public class Titan {
 			int ID;
 			String Name;
-			int Estado, Tipo;
+			int Tipo;
+			String Estado;
+			String Distrito;
 			public Titan() {
 			}
-			public Titan(int ID_, String Name_, int Tipo_, int Estado_) {
+			public Titan(int ID_, String Name_, int Tipo_, String Estado_, String Distrito_) {
 				this.ID = ID_;
 				this.Name = Name_;
 				this.Estado = Estado_;
 				this.Tipo = Tipo_;
+				this.Distrito = Distrito_;
 			}
 		}
 
@@ -120,6 +94,7 @@ public class cliente {
 			listMulticast = executorService.submit(new Runnable() {
 					public void run() {
 						try{
+							int this_id = id_dist;
 							InetAddress address = InetAddress.getByName(DIST_IPMULT);
 							try (MulticastSocket clientSocket = new MulticastSocket(DIST_PMULT)){
 									clientSocket.joinGroup(address);
@@ -129,7 +104,7 @@ public class cliente {
 											clientSocket.receive(msgPacket);
 											//String msg = new String(buf, 0, buf.length);
 											String msg = new String(msgPacket.getData(), msgPacket.getOffset(), msgPacket.getLength());
-											if(!(msg.equals(""))){ System.out.println(msg);}
+											if(!(msg.equals("")) && (this_id != id_dist)){ System.out.println(msg);}
 									}
 							} catch (IOException ex) {
 									ex.printStackTrace();
@@ -204,11 +179,12 @@ public class cliente {
 					String in_msg = "2";
 					listMulticast.cancel(true); 
 					AskServCentral(in);
-
+					id_dist++;
 
 					listMulticast = executorService.submit(new Runnable() {
 							public void run() {
 								try{
+									int this_id = id_dist;
 									InetAddress address = InetAddress.getByName(DIST_IPMULT);
 									try (MulticastSocket clientSocket = new MulticastSocket(DIST_PMULT)){
 											clientSocket.joinGroup(address);
@@ -217,7 +193,7 @@ public class cliente {
 													DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
 													clientSocket.receive(msgPacket);
 													String msg = new String(msgPacket.getData(), msgPacket.getOffset(), msgPacket.getLength());
-													if(!(msg.equals(""))){ System.out.println(msg);}
+													if(!(msg.equals("")) && (this_id == id_dist)){ System.out.println(msg);}
 											}
 									} catch (IOException ex) {
 											ex.printStackTrace();
@@ -234,22 +210,26 @@ public class cliente {
 					titan_id = in.nextInt();
 					in.nextLine();
 					String in_msg = "3-"+titan_id;
-					sendUnicastMsg(in_msg, 1);
+					String resp = sendUnicastMsg(in_msg, 1);
+					manipularTitan(resp, 1);
 				}
 				else if(choose.equals("4")){
 					System.out.println("Ingrese el ID del titan a asesinar");
 					titan_id = in.nextInt();
 					in.nextLine();
 					String in_msg = "4-"+titan_id;
-					sendUnicastMsg(in_msg, 1);
+					String resp = sendUnicastMsg(in_msg, 1);
+					manipularTitan(resp, 2);
 				}
 				else if(choose.equals("5")){
 					String in_msg = "5";
-					sendUnicastMsg(in_msg, 1);
+					imprimirTitanes(capturados);
+					//sendUnicastMsg(in_msg, 1);
 				}
 				else if(choose.equals("6")){
 					String in_msg = "6";
-					sendUnicastMsg(in_msg, 1);
+					imprimirTitanes(asesinados);
+					//sendUnicastMsg(in_msg, 1);
 				}
 
 				else{
@@ -259,6 +239,45 @@ public class cliente {
 
 			System.out.println("Terminando App");
 			listenMulticast.interrupt();
+		}
+
+
+		public void manipularTitan(String resp, int accion){
+				if(!resp.equals("0")){
+					String [] val= resp.split("-");
+					Titan aux = new Titan(Integer.parseInt(val[0]), val[1], 
+							Integer.parseInt(val[2]), val[3], val[4]);
+					if (accion == 1) {
+						capturados.add(aux);
+					}
+					else {
+						asesinados.add(aux);
+					}
+				}
+				else{
+					System.out.println("Titan no manipulable");
+				}
+		}
+
+
+		public void imprimirTitanes(ArrayList<Titan> titanes){
+			String response = "";
+			if(titanes.size() > 0){
+				for (int i = 0; i < titanes.size(); i++){
+					Titan aux = titanes.get(i);
+					response+="************\n";
+					response+="ID: "+aux.ID+"\n";
+					response+="Nombre: "+aux.Name+"\n";
+					response+="Tipo: "+aux.Tipo+"\n";
+					response+="Estado: "+aux.Estado+"\n";
+					response+="Distrito: "+aux.Distrito+"\n";
+					response+="************\n";
+					System.out.println(response);
+				}
+			}
+			else {
+				System.out.println("No se encuentran titanes en este estado para el cliente");
+			}
 		}
 
 

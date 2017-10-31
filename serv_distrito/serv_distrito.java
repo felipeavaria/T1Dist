@@ -93,20 +93,22 @@ public class serv_distrito {
 												stringResponse+="Ingrese los datos del distrito a cambiar";
 											}
 											else if(s[0].equals("3")){
+												//manipularTitan(Integer.parseInt(s[1]), 1);
+												//stringResponse+="Titan Capturado! (ficticiamente)";
 												stringResponse = manipularTitan(Integer.parseInt(s[1]), 1);
-												stringResponse+="Titan Capturado! (ficticiamente)";
 											}
 											else if(s[0].equals("4")){
+												//manipularTitan(Integer.parseInt(s[1]), 2);
+												//stringResponse+="Titan asesinado! eres malvado";
 												stringResponse = manipularTitan(Integer.parseInt(s[1]), 2);
-												stringResponse+="Titan asesinado! eres malvado";
 											}
 											else if(s[0].equals("5")){
-												stringResponse+="Listado de Titantes Capturados :D";
-												stringResponse = imprimirTitanesCliente(1);
+												//stringResponse+="Listado de Titantes Capturados :D";
+												//stringResponse = imprimirTitanesCliente(1);
 											}
 											else if(s[0].equals("6")){
-												stringResponse+="Listado de Titanes Asesinados :( ";
-												stringResponse = imprimirTitanesCliente(2);
+												//stringResponse+="Listado de Titanes Asesinados :( ";
+												//stringResponse = imprimirTitanesCliente(2);
 											}
 
 											InetAddress IPAddress = receivePacket.getAddress();
@@ -309,11 +311,18 @@ public class serv_distrito {
 					aux = titanes.get(i);
 					if (aux.ID == id_titan && aux.Estado == 0){
 						aux.Estado = accion;
-						return "Titan "+aux.Name+" manipulado con "+accion+", con id="+aux.ID+"; ";
+						//return "Titan "+aux.Name+" manipulado con "+accion+", con id="+aux.ID+"; ";
+						//return "Titan "+aux.Name+" manipulado con "+accion+", con id="+aux.ID+"; ";
+						if(accion == 1){
+							return aux.ID+"-"+aux.Name+"-"+aux.Tipo+"-"+"Capturado-"+NOMBRE;
+						}
+						else {
+							return aux.ID+"-"+aux.Name+"-"+aux.Tipo+"-"+"Asesinado-"+NOMBRE;
+						}
 					}
 				}
 				System.out.println("Titan no disponible (ya capturado, asesinado, o no pertenece a distrito)");
-				return "Titan no disponible (ya capturado, asesinado, o no pertenece a distrito)";
+				return "0";
 		}
 
 

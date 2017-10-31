@@ -104,7 +104,7 @@ public class cliente {
 											clientSocket.receive(msgPacket);
 											//String msg = new String(buf, 0, buf.length);
 											String msg = new String(msgPacket.getData(), msgPacket.getOffset(), msgPacket.getLength());
-											if(!(msg.equals("")) && (this_id != id_dist)){ System.out.println(msg);}
+											if(!(msg.equals("")) && (this_id == id_dist)){ System.out.println(msg);}
 									}
 							} catch (IOException ex) {
 									ex.printStackTrace();

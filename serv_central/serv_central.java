@@ -85,6 +85,7 @@ public class clienteEntrante{
 					};
 
 
+				/*
 			Thread hiloC = new Thread(){
 						public void run(){
 							try{
@@ -97,10 +98,11 @@ public class clienteEntrante{
 						}
 
 					};
+					*/
 			hiloA.start();
 			hiloB.start();
 
-			hiloC.start();
+			//hiloC.start();
 		}
 		public class Distrito{
 			String Nombre;
@@ -124,7 +126,7 @@ public class clienteEntrante{
 
 		public void menu() throws UnknownHostException, InterruptedException{
 			boolean menu = true;
-			//Scanner in= new Scanner(System.in);
+			Scanner in= new Scanner(System.in);
 			/*
 			EscucharMensajes escucha = new EscucharMensajes();
 			*/
@@ -136,15 +138,12 @@ public class clienteEntrante{
         System.out.println("2) Ver lista de Distritos");
 				System.out.println("3) Permitir conexión a cleintes pendientes ("+clientes.size()+")");
 
-
-
-					String user_input = waitInput();
-
-
+					//String user_input = waitInput();
+					String user_input = in.nextLine();
 
 					if(user_input.equals("1")){
 						//System.out.println("opcion 1");
-						agregarDistrito();
+						agregarDistrito(in);
 
 					}
 					else if(user_input.equals("2")){
@@ -157,14 +156,14 @@ public class clienteEntrante{
 						System.out.println("Permitiendo conexion de usuarios");
 						lock.wait();
 						*/
-						aceptarClientes();
+						aceptarClientes(in);
 					}
 			}
 		}
 
 
 
-		public void agregarDistrito() throws InterruptedException{
+		public void agregarDistrito(Scanner in) throws InterruptedException{
 			int a;
 			String nombre, ip_multicast, ip_peticiones;
 			String p_multicast, p_peticiones;
@@ -172,23 +171,24 @@ public class clienteEntrante{
 			//in.nextLine();
 			System.out.println("Nombre Distrito:");
 			//nombre = in.nextLine();
-			nombre = waitInput();
+			//nombre = waitInput();
+			nombre = in.nextLine();
 
 			System.out.println("IP Multicast:");
-			//ip_multicast = in.nextLine();
-			ip_multicast = waitInput();
+			//ip_multicast = waitInput();
+			ip_multicast = in.nextLine();
 
 			System.out.println("Puerto Multicast:");
-			p_multicast = waitInput();
-			//p_multicast = in.nextLine();
+			//p_multicast = waitInput();
+			p_multicast = in.nextLine();
 
 			System.out.println("IP Peticiones:");
-			ip_peticiones = waitInput();
-			//ip_peticiones = in.nextLine();
+			//ip_peticiones = waitInput();
+			ip_peticiones = in.nextLine();
 
 			System.out.println("Puerto Peticiones:");
-			p_peticiones = waitInput();
-			//p_peticiones = in.nextLine();
+			//p_peticiones = waitInput();
+			p_peticiones = in.nextLine();
 
 			Distrito distrito = new Distrito(nombre,ip_multicast, p_multicast,ip_peticiones,p_peticiones);
 			distritos.add(distrito);
@@ -241,7 +241,7 @@ public class clienteEntrante{
 			}
 		}
 
-		public void aceptarClientes() throws InterruptedException {
+		public void aceptarClientes(Scanner in) throws InterruptedException {
 			if (clientes.size() > 0){
 
 				while(clientes.size() > 0){
@@ -252,7 +252,8 @@ public class clienteEntrante{
 					 System.out.println("Dar autorizacion a /IP: "+aux.IP+" para Distrito "+aux.msg);
 					 System.out.println("1.- SI");
 					 System.out.println("2.- NO");
-					 String ans = waitInput();
+					// String ans = waitInput();
+					 String ans = in.nextLine();
 					 String response = "";
 						if (ans.equals("1")){
 							Distrito datos = buscarDatosDistrito(aux.msg);
@@ -354,6 +355,7 @@ public class clienteEntrante{
         	                }
 	         }
 
+		/*
 		public String waitInput() throws InterruptedException{
 			while(true){
 				if (!user_input.equals("")){
@@ -364,6 +366,7 @@ public class clienteEntrante{
 				Thread.sleep(500);
 			}
 		}
+		*/
 
 
       public boolean buscarDistrito(String nombre){

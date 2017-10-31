@@ -39,3 +39,21 @@ Andrés Cifuentes	201004652-4
 * Luego, se observara un menú, donde estan las acciones de servidor central.
 * Agregar distritos es algo importante, ya que permite que los clientes puedan conectarse.
 * Cuando un cliente se conecta, le aparecera una notificación en consola. Tiene que ingresar a la opcion del menu de "aceptar peticiones de clientes" para poder autorizar la conexión de clientes.
+
+**************************
+*** OTROS / IMPORTANTE ***
+**************************
+
+* En los 3 programas, se tiene una nomenclatura para el tipo de Titan, y el estado de un titan (libre, capturado, o asesinado). El significado de los numeros que se muestran en el programa son los siguientes:
+
+** Tipo de Titan **
+1: Normal
+2: Excentrico
+3: Cambiante
+
+** Estado de un Titan **
+0: Libre
+1: Capturado
+2: Asesinado
+
+

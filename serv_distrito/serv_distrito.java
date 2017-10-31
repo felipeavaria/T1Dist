@@ -305,18 +305,29 @@ public class serv_distrito {
 		}
 
 
-		public String manipularTitan(int id_titan, int accion) {
+		public String manipularTitan(int id_titan, int accion) throws Exception {
 				Titan aux;
+				String tipo = "";
 				for(int i=0; i<titanes.size(); i++){
 					aux = titanes.get(i);
+					if (aux.Tipo == 1){
+						tipo = "Normal";
+					}
+					else if (aux.Tipo == 2){
+						tipo = "Excentrico";
+					}
+					else {
+						tipo = "Cambiante";
+					}
 					if (aux.ID == id_titan && aux.Estado == 0){
-						aux.Estado = accion;
-						//return "Titan "+aux.Name+" manipulado con "+accion+", con id="+aux.ID+"; ";
-						//return "Titan "+aux.Name+" manipulado con "+accion+", con id="+aux.ID+"; ";
-						if(accion == 1){
+						if(accion == 1 && ((aux.Tipo == 1) || (aux.Tipo == 3))){
+							sendMessage("Titan "+aux.Name+" de ID "+aux.ID+", y tipo "+tipo+", ha sido Capturado");
+							aux.Estado = accion;
 							return aux.ID+"-"+aux.Name+"-"+aux.Tipo+"-"+"Capturado-"+NOMBRE;
 						}
-						else {
+						else if(accion == 2 && ((aux.Tipo == 1) || (aux.Tipo == 2))) {
+							sendMessage("Titan "+aux.Name+" de ID "+aux.ID+", y tipo "+tipo+", ha sido Asesinado");
+							aux.Estado = accion;
 							return aux.ID+"-"+aux.Name+"-"+aux.Tipo+"-"+"Asesinado-"+NOMBRE;
 						}
 					}

@@ -23,7 +23,10 @@ public class cliente {
 		public int DIST_PPETIC = 8887;
 
 		public Thread listenMulticast;
+		public Future listMulticast;
+		//public Thread listenMulticast;
 		ExecutorService executorService = Executors.newFixedThreadPool(10);
+		boolean running = true;
 
 
     public static void main(String[] args) throws UnknownHostException, Exception {
@@ -87,8 +90,6 @@ public class cliente {
 
 		public cliente() throws UnknownHostException, Exception {
 
-			listenMulticast = startThread();
-
 			Scanner in = new Scanner(System.in);
 			System.out.println("Ingresar IP del Servidor Central");
 			INET_ADDR_SCENTRAL = in.nextLine();
@@ -98,8 +99,30 @@ public class cliente {
 				PORT_SERVCENTRAL = Integer.parseInt(puerto_central);
 
 			AskServCentral(in);
+			listMulticast = executorService.submit(new Runnable() {
+					public void run() {
+						try{
+							InetAddress address = InetAddress.getByName(DIST_IPMULT);
+							try (MulticastSocket clientSocket = new MulticastSocket(DIST_PMULT)){
+									clientSocket.joinGroup(address);
+									while (true) {
+											byte[] buf = new byte[256];
+											DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
+											clientSocket.receive(msgPacket);
+											//String msg = new String(buf, 0, buf.length);
+											String msg = new String(msgPacket.getData(), msgPacket.getOffset(), msgPacket.getLength());
+											if(!(msg.equals(""))){ System.out.println(msg);}
+									}
+							} catch (IOException ex) {
+									ex.printStackTrace();
+							}
+						}
+						catch(Exception e){
+							 e.printStackTrace();
+						}
+					}
+			});
 
-			listenMulticast.start();
 			menu(in);
 		}
 
@@ -160,34 +183,24 @@ public class cliente {
 					sendUnicastMsg(in_msg, 1);
 				}
 				else if(choose.equals("2")){
-					//System.exit(5);
 					String in_msg = "2";
-					listenMulticast.interrupt(); // tell the thread to stop
-					listenMulticast.join();
-					//sendUnicastMsg(in_msg, 1);
+					listMulticast.cancel(true); 
 					AskServCentral(in);
-					listenMulticast.run();
 
-/*
-					listenMulticast = new Thread() {
-						@Override
-						public void run() {
-							System.out.println("** Running mutlicast thread; ip: "+DIST_IPMULT+"; puerto: "+DIST_PMULT); 
+
+					listMulticast = executorService.submit(new Runnable() {
+							public void run() {
 								try{
 									InetAddress address = InetAddress.getByName(DIST_IPMULT);
-
 									try (MulticastSocket clientSocket = new MulticastSocket(DIST_PMULT)){
 											clientSocket.joinGroup(address);
-
-											while (!this.isInterrupted()) {
+											while (running) {
 													byte[] buf = new byte[256];
 													DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
 													clientSocket.receive(msgPacket);
-													//String msg = new String(buf, 0, buf.length);
 													String msg = new String(msgPacket.getData(), msgPacket.getOffset(), msgPacket.getLength());
 													if(!(msg.equals(""))){ System.out.println(msg);}
 											}
-											System.out.println("Se acabo el loop :)");
 									} catch (IOException ex) {
 											ex.printStackTrace();
 									}
@@ -195,9 +208,8 @@ public class cliente {
 								catch(Exception e){
 									 e.printStackTrace();
 								}
-						}
-					};
-					*/
+							}
+					});
 				}
 				else if(choose.equals("3")){
 					System.out.println("Ingrese el ID del titan a capturar");
@@ -264,32 +276,6 @@ public class cliente {
 			System.out.println("ip_peticiones: "+ip_peticiones);
 			in.nextLine();
 		}
-
-
-		/*
-		public void recibirMensajes()  throws UnknownHostException {
-        InetAddress address = InetAddress.getByName(INET_ADDR);
-				boolean while_ = true;
-        byte[] buf = new byte[256];
-
-        try (MulticastSocket clientSocket = new MulticastSocket(PORT)){
-            clientSocket.joinGroup(address);
-            while (while_) {
-								if (Thread.currentThread().isInterrupted()) {
-									//System.out.println("Interrupting");
-									while_ = false;
-								}
-                DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
-                clientSocket.receive(msgPacket);
-
-                String msg = new String(buf, 0, buf.length);
-                System.out.println(msg);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-		}
-		*/
 
 
 	public static void ConectarServCentral(Scanner in) throws UnknownHostException, InterruptedException{

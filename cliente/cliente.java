@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.util.concurrent.*;
 
 
 public class cliente {
@@ -21,31 +22,35 @@ public class cliente {
 		public String DIST_IPPETIC = "";
 		public int DIST_PPETIC = 8887;
 
-		public Thread thread1;
+		public Thread listenMulticast;
+		public Future listMulticast;
+		//public Thread listenMulticast;
+		ExecutorService executorService = Executors.newFixedThreadPool(10);
+		boolean running = true;
 
 
     public static void main(String[] args) throws UnknownHostException, Exception {
 			new cliente();
     }
 
-		public void startThread(){
-			thread1 = new Thread() {
+		public Thread startThread(){
+			Thread aux = new Thread() {
 				@Override
 				public void run() {
 						try{
 							InetAddress address = InetAddress.getByName(DIST_IPMULT);
-							byte[] buf = new byte[256];
 
 							try (MulticastSocket clientSocket = new MulticastSocket(DIST_PMULT)){
 									clientSocket.joinGroup(address);
 
 									while (!this.isInterrupted()) {
+											byte[] buf = new byte[256];
 											DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
 											clientSocket.receive(msgPacket);
-
-											String msg = new String(buf, 0, buf.length);
+											//String msg = new String(buf, 0, buf.length);
+											String msg = new String(msgPacket.getData(), msgPacket.getOffset(), msgPacket.getLength());
+											if(!(msg.equals(""))){ System.out.println(msg);}
 									}
-									System.out.println("Se acabo el loop :)");
 							} catch (IOException ex) {
 									ex.printStackTrace();
 							}
@@ -55,6 +60,7 @@ public class cliente {
 						}
 				}
 			};
+			return aux;
 		}
 
 		public void AskServCentral(Scanner in){
@@ -66,9 +72,7 @@ public class cliente {
 			try{
 				String data_distrito = sendUnicastMsg(in_msg, 0);
 				if(!(data_distrito.equals(""))){
-					System.out.println("antes del split");
 					String[] data = data_distrito.split("-");
-					System.out.println("despues del split");
 					DIST_NOMBRE = data[0];  //nombre
 					DIST_IPMULT = data[1];  //ip multicast
 					DIST_PMULT = Integer.parseInt(data[2]);  //puerto multicast
@@ -86,8 +90,6 @@ public class cliente {
 
 		public cliente() throws UnknownHostException, Exception {
 
-			startThread();
-
 			Scanner in = new Scanner(System.in);
 			System.out.println("Ingresar IP del Servidor Central");
 			INET_ADDR_SCENTRAL = in.nextLine();
@@ -97,8 +99,30 @@ public class cliente {
 				PORT_SERVCENTRAL = Integer.parseInt(puerto_central);
 
 			AskServCentral(in);
+			listMulticast = executorService.submit(new Runnable() {
+					public void run() {
+						try{
+							InetAddress address = InetAddress.getByName(DIST_IPMULT);
+							try (MulticastSocket clientSocket = new MulticastSocket(DIST_PMULT)){
+									clientSocket.joinGroup(address);
+									while (true) {
+											byte[] buf = new byte[256];
+											DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
+											clientSocket.receive(msgPacket);
+											//String msg = new String(buf, 0, buf.length);
+											String msg = new String(msgPacket.getData(), msgPacket.getOffset(), msgPacket.getLength());
+											if(!(msg.equals(""))){ System.out.println(msg);}
+									}
+							} catch (IOException ex) {
+									ex.printStackTrace();
+							}
+						}
+						catch(Exception e){
+							 e.printStackTrace();
+						}
+					}
+			});
 
-			thread1.start();
 			menu(in);
 		}
 
@@ -159,15 +183,33 @@ public class cliente {
 					sendUnicastMsg(in_msg, 1);
 				}
 				else if(choose.equals("2")){
-					//System.exit(5);
 					String in_msg = "2";
-					thread1.interrupt(); // tell the thread to stop
-					System.out.println("Interrupting Thread");
-					//thread1.join();
-					System.out.println("thread stopped oin menu");
-					//sendUnicastMsg(in_msg, 1);
+					listMulticast.cancel(true); 
 					AskServCentral(in);
-					startThread();
+
+
+					listMulticast = executorService.submit(new Runnable() {
+							public void run() {
+								try{
+									InetAddress address = InetAddress.getByName(DIST_IPMULT);
+									try (MulticastSocket clientSocket = new MulticastSocket(DIST_PMULT)){
+											clientSocket.joinGroup(address);
+											while (running) {
+													byte[] buf = new byte[256];
+													DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
+													clientSocket.receive(msgPacket);
+													String msg = new String(msgPacket.getData(), msgPacket.getOffset(), msgPacket.getLength());
+													if(!(msg.equals(""))){ System.out.println(msg);}
+											}
+									} catch (IOException ex) {
+											ex.printStackTrace();
+									}
+								}
+								catch(Exception e){
+									 e.printStackTrace();
+								}
+							}
+					});
 				}
 				else if(choose.equals("3")){
 					System.out.println("Ingrese el ID del titan a capturar");
@@ -200,7 +242,7 @@ public class cliente {
 			}
 
 			System.out.println("Terminando App");
-			thread1.interrupt();
+			listenMulticast.interrupt();
 		}
 
 
@@ -234,32 +276,6 @@ public class cliente {
 			System.out.println("ip_peticiones: "+ip_peticiones);
 			in.nextLine();
 		}
-
-
-		/*
-		public void recibirMensajes()  throws UnknownHostException {
-        InetAddress address = InetAddress.getByName(INET_ADDR);
-				boolean while_ = true;
-        byte[] buf = new byte[256];
-
-        try (MulticastSocket clientSocket = new MulticastSocket(PORT)){
-            clientSocket.joinGroup(address);
-            while (while_) {
-								if (Thread.currentThread().isInterrupted()) {
-									//System.out.println("Interrupting");
-									while_ = false;
-								}
-                DatagramPacket msgPacket = new DatagramPacket(buf, buf.length);
-                clientSocket.receive(msgPacket);
-
-                String msg = new String(buf, 0, buf.length);
-                System.out.println(msg);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-		}
-		*/
 
 
 	public static void ConectarServCentral(Scanner in) throws UnknownHostException, InterruptedException{

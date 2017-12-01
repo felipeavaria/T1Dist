@@ -11,6 +11,9 @@ import java.io.Serializable;
  * Interface remota con los metodos que se podran llamar en remoto
  * @author  Javier Abellan
  */
-public interface IRemota extends Remote {
+public interface InterfazToken extends Remote {
     public int suma (int a, int b) throws RemoteException; 
+    public boolean soyDe (int a) throws RemoteException; 
+    public boolean available () throws RemoteException; 
+    public boolean freeToken () throws RemoteException; 
 }

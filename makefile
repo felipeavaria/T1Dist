@@ -3,21 +3,21 @@ JC = javac
 J = java
 RMIC = rmic
 MAIN = Servidor
-ROBJ = ObjetoRemoto
+ROBJ = Token
 CLASSPATH = ./
 .SUFFIXES: .java .class
 .java.class:
 	$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
-	IRemota.java \
-	ObjetoRemoto.java \
+	InterfazToken.java \
+	Token.java \
 	Servidor.java
 
 CLASSES2 = \
-	IRemota.java \
-	ObjetoRemoto.java \
-	Cliente.java
+	InterfazToken.java \
+	Token.java \
+	Semaforo.java
 
 default: clean classes classes2 rmic
 
@@ -26,7 +26,7 @@ classes: $(CLASSES:.java=.class) \
 classes2: $(CLASSES2:.java=.class) \
 
 rmic: 
-	rmic ObjetoRemoto
+	rmic Token
 
 run: rmic 
 	$(J) $(MAIN)

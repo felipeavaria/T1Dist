@@ -31,13 +31,13 @@ public class Token extends UnicastRemoteObject implements InterfazToken
     /**
      * Obtiene la suma de los sumandos que le pasan y la devuelve.
      */
-    public int suma(int a, int b) 
+    public int suma(int a, int b)
     {
 	    System.out.println ("Sumando " + a + " + " + b +"...");
         return a+b;
     }
 
-    public boolean soyDe(int a) 
+    public boolean soyDe(int a)
     {
 				Taken = true;
 				procesoActual = a;
@@ -59,5 +59,10 @@ public class Token extends UnicastRemoteObject implements InterfazToken
 				Taken = false;
 				return true;
 		}
-    
+
+		/* al pasar por todos los nodos se debe ejecuatar kill que mata el Servidor */
+		public void kill(){
+
+		}
+
 }

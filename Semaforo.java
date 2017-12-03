@@ -18,8 +18,8 @@ public class Semaforo {
 		private int id;
 		InterfazToken token;
 		// private int timeout;
-    //public Semaforo(int id_) 
-    public Semaforo(int id_, int timeout) 
+    //public Semaforo(int id_, int timeout) 
+    public Semaforo(int id_) 
     {
 				id = id_;
         try

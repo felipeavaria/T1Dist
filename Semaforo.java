@@ -5,6 +5,7 @@
  */
 
 import java.rmi.*;
+import java.util.ArrayList;
 
 /**
  * Ejemplo de cliente rmi nocivo, para aprovecharse de un servidor sin
@@ -17,6 +18,8 @@ public class Semaforo {
     /** Crea nueva instancia de Semaforo */
 		private int id;
 		InterfazToken token;
+		InterfazLista lista;
+		InterfazProceso proceso;
 		// private int timeout;
     //public Semaforo(int id_, int timeout) 
     public Semaforo(int id_) 
@@ -30,6 +33,11 @@ public class Semaforo {
 		// Naming.lookup() obtiene el objeto remoto
             //InterfazToken token = 
             token = (InterfazToken)Naming.lookup ("//localhost/Token");
+						lista = (InterfazLista)Naming.lookup ("//localhost/Lista");
+						proceso = new Proceso(id);
+						System.out.println ("Añaidendo proceso...");
+						addToList(proceso);
+						System.out.println ("Listaylor");
             
             // Se realiza la suma remota.
             ///System.out.print ("2 + 3 = ");
@@ -41,7 +49,7 @@ public class Semaforo {
 						takeToken(token);
             System.out.println("En Zona Critica, el token es mio");
 						//Thread.sleep(timeout);
-						Thread.sleep(4000);
+						Thread.sleep(3000);
             System.out.println("Sali de Zona Critica");
 						token.freeToken();
         }
@@ -49,6 +57,7 @@ public class Semaforo {
         {
             e.printStackTrace();
         }
+				kill();
     }
     
     /**
@@ -57,8 +66,20 @@ public class Semaforo {
     public static void main(String[] args) {
 				//System.out.println(args[0]);
         new Semaforo(Integer.parseInt(args[0]));
+				System.out.println("En codigo main");
+				System.exit(1);
         //new Semaforo(Integer.parseInt(args[0]), Integer.parseInt(args[1])));
     }
+
+		public void addToList(InterfazProceso proceso){
+			try{
+				lista.addProceso(proceso);
+			}
+			catch (Exception e)
+			{
+					e.printStackTrace();
+			}
+		}
 
 		public void request(int id, int seq){
 		
@@ -87,7 +108,16 @@ public class Semaforo {
 		}
 
 		public void kill(){
-		
+				try{
+						//int pos = lista_.indexOf(proceso);
+						//System.out.println("elimiando proceso en posicion: "+proceso);
+						lista.killProceso(proceso);
+						System.out.println("eliminacion lista");
+				}
+				catch (Exception e){
+						e.printStackTrace();
+				}
+				System.out.println("x2");
 		}
     
 }

@@ -14,15 +14,15 @@ import java.util.ArrayList;
  */
 
 public class Semaforo {
-    
+
     /** Crea nueva instancia de Semaforo */
 		private int id;
 		InterfazToken token;
 		InterfazLista lista;
 		InterfazProceso proceso;
 		// private int timeout;
-    //public Semaforo(int id_, int timeout) 
-    public Semaforo(int id_) 
+    //public Semaforo(int id_)
+    public Semaforo(int id_)//, int timeout)
     {
 				id = id_;
         try
@@ -31,7 +31,7 @@ public class Semaforo {
 		// Debe reemplazarse "localhost" por el nombre o ip donde
 		// este corriendo "rmiregistry".
 		// Naming.lookup() obtiene el objeto remoto
-            //InterfazToken token = 
+            //InterfazToken token =
             token = (InterfazToken)Naming.lookup ("//localhost/Token");
 						lista = (InterfazLista)Naming.lookup ("//localhost/Lista");
 						proceso = new Proceso(id);
@@ -51,7 +51,10 @@ public class Semaforo {
 						//Thread.sleep(timeout);
 						Thread.sleep(3000);
             System.out.println("Sali de Zona Critica");
-						token.freeToken();
+						boolean sali=token.freeToken(id);
+            if(sali){
+              System.out.println("algo !!");
+            }
         }
         catch (Exception e)
         {
@@ -59,7 +62,7 @@ public class Semaforo {
         }
 				kill();
     }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -82,14 +85,22 @@ public class Semaforo {
 		}
 
 		public void request(int id, int seq){
-		
+
 		}
 
+/*
+    waitToken funcion que espera el token, inicialmente hace un peticion y esta queda en colada
+*/
 		public void waitToken(){
 			boolean asd = true;
+      try{
+        token.getToken(id);
+      }catch(Exception e){
+        e.printStackTrace();
+      }
 			while(asd){
 				try{
-					asd = !token.available();
+					asd = !token.available(id);
 					Thread.sleep(100);
 				}
 				catch(Exception e){
@@ -119,5 +130,5 @@ public class Semaforo {
 				}
 				System.out.println("x2");
 		}
-    
+
 }

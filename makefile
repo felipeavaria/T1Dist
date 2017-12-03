@@ -21,8 +21,7 @@ CLASSES = \
 
 CLASSES2 = \
 	InterfazToken.java \
-	Token.java \
-	Semaforo.java
+	Token.java 
 
 default: clean classes classes2 
 
@@ -45,8 +44,8 @@ run: rmic
 clean:
 	$(RM) *.class
 
-cliente: 
-	$(J) Cliente
+semaforo: 
+	$(J) Semaforo
 
 servidor: 
 	$(J) Servidor

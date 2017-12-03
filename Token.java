@@ -9,8 +9,9 @@
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Queue;
-import java.util.LinkedList;
+
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @author  Javier Abellan
@@ -22,18 +23,20 @@ public class Token extends UnicastRemoteObject implements InterfazToken
      * @throws RemoteException
      */
 		private int[] LN;
-		private LinkedList colaProcesos;
+		private List<Integer> colaProcesos;
+		private int n;
 		private int procesoActual;
 		private boolean Taken = false;
     public Token (int n) throws RemoteException
     {
         //super();
 				LN = new int[n];
+				this.n=n;
 				for (int i=0;i<n;i++){
 					LN[i]=0;
 					System.out.println("LN["+i+"]="+LN[i]);
 				}
-				colaProcesos = new LinkedList();
+				colaProcesos = new ArrayList<Integer>();
 
     }
 
@@ -55,13 +58,18 @@ public class Token extends UnicastRemoteObject implements InterfazToken
 				return true;
     }
 		public void getToken(int p){
-				System.out.println("en cola "+ p);
+
 				colaProcesos.add(p);
+				System.out.println("en cola "+ p + " size = "+colaProcesos.size());
 				LN[p-1]=1;
 		}
 
-		public boolean available(){
-				if(Taken == false){
+		public boolean available(int p){
+
+				int aux;
+				aux=colaProcesos.indexOf(p);
+				if(Taken == false && aux == 0 ){
+						System.out.println("token liberado y sera tomado por "+ p);
 						return true;
 				}
 				else{
@@ -69,14 +77,29 @@ public class Token extends UnicastRemoteObject implements InterfazToken
 				}
 		}
 
-		public boolean freeToken(){
+		public boolean freeToken(int p){
+				System.out.println("rmove en cola "+ p + " size = "+colaProcesos.size());
+				colaProcesos.remove((Integer) p);
+				System.out.println("remove en cola "+ p + " size = "+colaProcesos.size());
+				kill();
 				Taken = false;
 				return true;
 		}
 
 		/* al pasar por todos los nodos se debe ejecuatar kill que mata el Servidor */
 		public void kill(){
-
+				if(colaProcesos.size()==0 && sumaProcesos() == n){
+					// kill server
+					System.out.println("Ahora hay que matar al server!!!");
+				}
+		}
+		public int sumaProcesos(){
+			int aux=0;
+			for (int i=0; i<n;i++){
+				aux=aux+LN[i];
+			}
+			System.out.println("suma = "+ aux);
+			return aux;
 		}
 
 }

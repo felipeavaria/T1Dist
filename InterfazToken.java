@@ -14,7 +14,7 @@ import java.io.Serializable;
 public interface InterfazToken extends Remote {
     public int suma (int a, int b) throws RemoteException;
     public boolean soyDe (int a) throws RemoteException;
-    public void getToken(int p)throws RemoteException; 
-    public boolean available () throws RemoteException;
-    public boolean freeToken () throws RemoteException;
+    public void getToken(int p)throws RemoteException;
+    public boolean available (int p) throws RemoteException;
+    public boolean freeToken (int p) throws RemoteException;
 }

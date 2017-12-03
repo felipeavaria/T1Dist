@@ -43,7 +43,10 @@ public class Semaforo {
 						//Thread.sleep(timeout);
 						Thread.sleep(4000);
             System.out.println("Sali de Zona Critica");
-						token.freeToken();
+						boolean sali=token.freeToken(id);
+            if(sali){
+              System.out.println("algo !!");
+            }
         }
         catch (Exception e)
         {
@@ -70,13 +73,13 @@ public class Semaforo {
 		public void waitToken(){
 			boolean asd = true;
       try{
-        token.getToken(1);
+        token.getToken(id);
       }catch(Exception e){
         e.printStackTrace();
       }
 			while(asd){
 				try{
-					asd = !token.available();
+					asd = !token.available(id);
 					Thread.sleep(100);
 				}
 				catch(Exception e){

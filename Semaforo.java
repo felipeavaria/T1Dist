@@ -13,13 +13,13 @@ import java.rmi.*;
  */
 
 public class Semaforo {
-    
+
     /** Crea nueva instancia de Semaforo */
 		private int id;
 		InterfazToken token;
 		// private int timeout;
-    //public Semaforo(int id_, int timeout) 
-    public Semaforo(int id_) 
+    //public Semaforo(int id_)
+    public Semaforo(int id_)//, int timeout)
     {
 				id = id_;
         try
@@ -28,9 +28,9 @@ public class Semaforo {
 		// Debe reemplazarse "localhost" por el nombre o ip donde
 		// este corriendo "rmiregistry".
 		// Naming.lookup() obtiene el objeto remoto
-            //InterfazToken token = 
+            //InterfazToken token =
             token = (InterfazToken)Naming.lookup ("//localhost/Token");
-            
+
             // Se realiza la suma remota.
             ///System.out.print ("2 + 3 = ");
 						// a traves
@@ -50,7 +50,7 @@ public class Semaforo {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -61,11 +61,19 @@ public class Semaforo {
     }
 
 		public void request(int id, int seq){
-		
+
 		}
 
+/*
+    waitToken funcion que espera el token, inicialmente hace un peticion y esta queda en colada
+*/
 		public void waitToken(){
 			boolean asd = true;
+      try{
+        token.getToken(1);
+      }catch(Exception e){
+        e.printStackTrace();
+      }
 			while(asd){
 				try{
 					asd = !token.available();
@@ -87,7 +95,7 @@ public class Semaforo {
 		}
 
 		public void kill(){
-		
+
 		}
-    
+
 }

@@ -12,12 +12,12 @@ CLASSPATH = ./
 CLASSES = \
 	InterfazToken.java \
 	Token.java \
-	Servidor.java
+	Servidor.java\
+	Semaforo.java
 
 CLASSES2 = \
 	InterfazToken.java \
-	Token.java \
-	Semaforo.java
+	Token.java 
 
 default: clean classes classes2 rmic
 
@@ -34,8 +34,8 @@ run: rmic
 clean:
 	$(RM) *.class
 
-cliente: 
-	$(J) Cliente
+semaforo: 
+	$(J) Semaforo
 
 servidor: 
 	$(J) Servidor

@@ -9,6 +9,8 @@
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Queue;
+import java.util.LinkedList;
 
 /**
  * @author  Javier Abellan
@@ -20,12 +22,19 @@ public class Token extends UnicastRemoteObject implements InterfazToken
      * @throws RemoteException
      */
 		private int[] LN;
+		private LinkedList colaProcesos;
 		private int procesoActual;
 		private boolean Taken = false;
     public Token (int n) throws RemoteException
     {
         //super();
 				LN = new int[n];
+				for (int i=0;i<n;i++){
+					LN[i]=0;
+					System.out.println("LN["+i+"]="+LN[i]);
+				}
+				colaProcesos = new LinkedList();
+
     }
 
     /**
@@ -45,6 +54,11 @@ public class Token extends UnicastRemoteObject implements InterfazToken
 				System.out.println("Token es de: "+procesoActual);
 				return true;
     }
+		public void getToken(int p){
+				System.out.println("en cola "+ p);
+				colaProcesos.add(p);
+				LN[p-1]=1;
+		}
 
 		public boolean available(){
 				if(Taken == false){

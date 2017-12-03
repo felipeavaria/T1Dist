@@ -12,6 +12,6 @@ import java.io.Serializable;
  * @author  Javier Abellan
  */
 public interface InterfazProceso extends Remote {
-    public int Proceso() throws RemoteException;
     public int getProceso() throws RemoteException;
 }
+

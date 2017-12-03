@@ -10,16 +10,20 @@ CLASSPATH = ./
 	$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
+	InterfazProceso.java \
+	InterfazLista.java \
 	InterfazToken.java \
+	Proceso.java \
+	Lista.java \
 	Token.java \
-	Servidor.java\
+	Servidor.java \
 	Semaforo.java
 
 CLASSES2 = \
 	InterfazToken.java \
 	Token.java 
 
-default: clean classes classes2 rmic
+default: clean classes classes2 
 
 classes: $(CLASSES:.java=.class) \
 
@@ -27,6 +31,12 @@ classes2: $(CLASSES2:.java=.class) \
 
 rmic: 
 	rmic Token
+
+rmic2:
+	rmic Lista
+
+rmic3:
+	rmic Proceso
 
 run: rmic 
 	$(J) $(MAIN)

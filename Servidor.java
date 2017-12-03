@@ -33,6 +33,10 @@ public class Servidor
             // Se publica el objeto remoto
             InterfazToken token = new Token(6);
             Naming.rebind ("//localhost/Token", token);
+
+            InterfazLista lista = new Lista();
+            Naming.rebind ("//localhost/Lista", lista);
+						System.out.println("Lista RMI Creada");
             //LocateRegistry.createRegistry(1099);
 						System.out.println("LocateRegistry ready");
 						//Thread.sleep(50000);

@@ -10,23 +10,17 @@ CLASSPATH = ./
 	$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
-	TheToken.java \
-	IntObjeto.java \
+	Token.java \
 	InterfazProceso.java \
 	InterfazLista.java \
-	InterfazToken.java \
 	Proceso.java \
 	Lista.java \
-	Token.java \
-	OToken.java \
-	Servidor.java \
 	Semaforo.java
 
 CLASSES2 = \
-	InterfazToken.java \
 	Token.java 
 
-default: clean classes classes2 
+default: clean classes 
 
 classes: $(CLASSES:.java=.class) \
 

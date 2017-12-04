@@ -14,8 +14,8 @@ import java.io.Serializable;
 public interface InterfazProceso extends Remote {
     public int getProceso() throws RemoteException;
 		public void print(String aux) throws RemoteException;
-		public TheToken getToken() throws RemoteException;
-		public void asignToken(TheToken token_) throws RemoteException;
+		public Token getToken() throws RemoteException;
+		public void asignToken(Token token_) throws RemoteException;
 		public boolean hasToken() throws RemoteException;
 }
 

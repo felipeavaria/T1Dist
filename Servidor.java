@@ -15,12 +15,12 @@ import java.rmi.registry.LocateRegistry;
  * Servidor para el ejemplo de RMI.
  * Exporte un metodo para sumar dos enteros y devuelve el resultado.
  */
-public class Servidor 
+public class Servidor
 {
-    
-    /** Crea nueva instancia de Servidor rmi */
+
+    /** Crea nueva instancia de Servidor rmi
     public Servidor() {
-        try 
+        try
         {
 		// Se indica a rmiregistry donde estan las clases.
 		// Cambiar el path al sitio en el que este. Es importante
@@ -29,31 +29,31 @@ public class Servidor
 		System.setProperty(
 			"java.rmi.server.codebase",
 			"file:$HOME/myclasses");*/
-		
-            // Se publica el objeto remoto
-            InterfazToken token = new Token(6);
-            Naming.rebind ("//localhost/Token", token);
 
-            InterfazLista lista = new Lista();
+            // Se publica el objeto remoto
+          //  InterfazToken token = new Token(6);
+      /*      Naming.rebind ("//localhost/Token", token);
+
+            InterfazLista lista = new Lista(6);
             Naming.rebind ("//localhost/Lista", lista);
 						System.out.println("Lista RMI Creada");
             //LocateRegistry.createRegistry(1099);
 						System.out.println("LocateRegistry ready");
-						//Thread.sleep(50000);
-            
+				*/		//Thread.sleep(50000);
+      /*
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
     }
-    
-    /**
+
+    **
      * @param args the command line arguments
-     */
+     *
     public static void main(String[] args) {
         new Servidor();
-    }
+    }*/
 }
 
 
@@ -68,7 +68,7 @@ import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 public class DA_Suzuki_Kasami_Main {
-    
+
     public static void main(String[] args){
 
         / / RMI registry initialization

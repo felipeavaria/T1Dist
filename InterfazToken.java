@@ -6,6 +6,7 @@
 
 import java.rmi.*;
 import java.io.Serializable;
+//import TheToken;
 
 /**
  * Interface remota con los metodos que se podran llamar en remoto
@@ -17,4 +18,9 @@ public interface InterfazToken extends Remote {
     public void getToken(int p)throws RemoteException;
     public boolean available (int p) throws RemoteException;
     public boolean freeToken (int p) throws RemoteException;
+
+  //  public TheToken recibirToken()throws RemoteException;
+  //  public boolean sendtoken(TheToken token) throws RemoteException;
+
+
 }

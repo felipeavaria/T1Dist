@@ -15,5 +15,6 @@ import java.util.ArrayList;
 public interface InterfazLista extends Remote {
 		public void addProceso(InterfazProceso proceso) throws RemoteException;
 		public void killProceso(InterfazProceso proc) throws RemoteException;
+		public boolean iniciar()throws RemoteException;
     public ArrayList<InterfazProceso> getLista() throws RemoteException;
 }

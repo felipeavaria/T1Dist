@@ -46,15 +46,16 @@ public class Semaforo {
             public void run(){
               try{
                 token = new Token(n);
+
                 Naming.rebind("//localhost/Token",token);
-                InterfazLista lista = new Lista();
+                InterfazLista lista = new Lista(n);
                 Naming.rebind ("//localhost/Lista", lista);
                 System.out.println("Lista RMI Creada");
-                //LocateRegistry.createRegistry(1099);
+                LocateRegistry.createRegistry(1199);
                 System.out.println("LocateRegistry ready");
                 System.out.println("creando token");
                   System.out.println("hola");
-                Thread.sleep(100000);
+                //Thread.sleep(100000);
                 System.out.println("chao");
               }catch ( Exception a) {
                 a.printStackTrace();
@@ -71,6 +72,11 @@ public class Semaforo {
         }else{
 
         }
+        // hay que espera que todos esten listos para empezar
+
+
+
+        boolean ver=true;
         try
         {
 		// Lugar en el que esta el objeto remoto.
@@ -78,12 +84,28 @@ public class Semaforo {
 		// este corriendo "rmiregistry".
 		// Naming.lookup() obtiene el objeto remoto
             //InterfazToken token =
-            token = (InterfazToken)Naming.lookup ("//localhost/Token");
-						lista = (InterfazLista)Naming.lookup ("//localhost/Lista");
+            try{
+              lista = (InterfazLista)Naming.lookup ("//localhost/Lista");
+              token = (InterfazToken)Naming.lookup ("//localhost/Token");
+            }
+            catch(Exception a){
+
+              if(ver){
+                System.out.println("Esperado que se inicie el proceso con bearer True ...");
+                ver= false;
+                try {
+                  Thread.sleep(2000);
+                }catch (Exception b) {
+                  b.printStackTrace();
+                }
+              }
+            }
+
 						proceso = new Proceso(id);
 						System.out.println ("Añaidendo proceso...");
 						addToList(proceso);
 						System.out.println ("Listaylor");
+            waitStart();
 
             // Se realiza la suma remota.
             ///System.out.print ("2 + 3 = ");
@@ -108,7 +130,7 @@ public class Semaforo {
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
 				//kill();
@@ -138,17 +160,41 @@ public class Semaforo {
 
 		public void addToList(InterfazProceso proceso){
 			try{
-				lista.addProceso(proceso);
+        lista.addProceso(proceso);
 			}
 			catch (Exception e)
 			{
-					e.printStackTrace();
+        System.out.println("Aun no se crea la lista esperado que se inicie el proceso con bearer True ...");
+					//e.printStackTrace();
 			}
 		}
 
 		public void request(int id, int seq){
 
 		}
+    /*
+        waitStart espera que todos los procesos esten iniciados para empezar
+    */
+    public void waitStart(){
+      boolean start = false;
+      while(!start){
+        try{
+          start = lista.iniciar();// no puedo hacer que ejecute el start...siempre cae en el catch...
+          Thread.sleep(1000);
+        }catch (Exception e) {
+          try {
+            Thread.sleep(1000);
+          }catch (Exception a) {
+            a.printStackTrace();
+          }
+
+        }
+      }
+    }
+
+
+
+
 
 /*
     waitToken funcion que espera el token, inicialmente hace un peticion y esta queda en colada

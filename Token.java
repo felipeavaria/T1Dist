@@ -16,7 +16,7 @@ import java.util.ArrayList;
 /**
  * @author  Javier Abellan
  */
-public class Token extends UnicastRemoteObject implements InterfazToken
+public class Token extends UnicastRemoteObject implements InterfazToken, Serializable
 {
     /**
      * Construye una instancia de Token
@@ -60,7 +60,7 @@ public class Token extends UnicastRemoteObject implements InterfazToken
 		public void getToken(int p){
 
 				colaProcesos.add(p);
-				System.out.println("en cola "+ p + " size = "+colaProcesos.size());
+
 				LN[p-1]=1;
 		}
 

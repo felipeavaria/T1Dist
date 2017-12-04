@@ -16,6 +16,7 @@ CLASSES = \
 	Proceso.java \
 	Lista.java \
 	Token.java \
+	TheToken.java \
 	Servidor.java \
 	Semaforo.java
 

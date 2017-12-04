@@ -5,6 +5,9 @@
  */
 
 import java.rmi.*;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.util.ArrayList;
 
 /**
@@ -12,19 +15,62 @@ import java.util.ArrayList;
  * SecurityManager.
  * @author  Javier Abellan
  */
+ // process <id> <n> <initialDelay> <bearer>
 
 public class Semaforo {
 
     /** Crea nueva instancia de Semaforo */
-		private int id;
+		private static int id;
+    private static int n;
+    private static int initialDelay;
+    private static boolean bearer;
 		InterfazToken token;
 		InterfazLista lista;
 		InterfazProceso proceso;
+
+    private String resetColor = "\u001B[0m";
+    private String Verdeblanco ="\u001B[42m"+"\u001B[37m";
+    private String RojoBlanco ="\u001B[41m"+"\u001B[37m";
+    private String AmarilloNegro="\u001B[43m"+"\u001B[30m";
 		// private int timeout;
     //public Semaforo(int id_)
-    public Semaforo(int id_)//, int timeout)
+    public Semaforo(int id_, int n_ , int initialDelay_ ,boolean bearer_)
     {
 				id = id_;
+        n = n_;
+        initialDelay =initialDelay_;
+        bearer =bearer_;
+        if(bearer){
+          //crear el token
+          Thread a = new Thread(){
+            public void run(){
+              try{
+                token = new Token(n);
+                Naming.rebind("//localhost/Token",token);
+                InterfazLista lista = new Lista();
+                Naming.rebind ("//localhost/Lista", lista);
+                System.out.println("Lista RMI Creada");
+                //LocateRegistry.createRegistry(1099);
+                System.out.println("LocateRegistry ready");
+                System.out.println("creando token");
+                  System.out.println("hola");
+                Thread.sleep(100000);
+                System.out.println("chao");
+              }catch ( Exception a) {
+                a.printStackTrace();
+              }
+            }
+          };
+          a.start();
+          try{
+            Thread.sleep(1000);
+          }catch (Exception e) {
+            e.printStackTrace();
+          }
+
+        }else{
+
+        }
         try
         {
 		// Lugar en el que esta el objeto remoto.
@@ -38,29 +84,34 @@ public class Semaforo {
 						System.out.println ("Añaidendo proceso...");
 						addToList(proceso);
 						System.out.println ("Listaylor");
-            
+
             // Se realiza la suma remota.
             ///System.out.print ("2 + 3 = ");
 						// a traves
 						// de objetoRemoto, el servidor realiza el metodo suma (no el cliente), y tengo la
 						// respuesta a través de este
             ///System.out.println (Token.suma(2,3));
-						waitToken();
+            System.out.println (AmarilloNegro+"   Esperando el Token   "+resetColor);
+
+            waitToken();
 						takeToken(token);
-            System.out.println("En Zona Critica, el token es mio");
+            System.out.println(RojoBlanco+"   En Zona Critica      "+ resetColor);
+
 						//Thread.sleep(timeout);
-						Thread.sleep(3000);
-            System.out.println("Sali de Zona Critica");
+						Thread.sleep(initialDelay);
+            System.out.println(Verdeblanco+"   Estoy ocioso         "+resetColor);
 						boolean sali=token.freeToken(id);
             if(sali){
               System.out.println("algo !!");
+              Thread.sleep(100000);
             }
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-				kill();
+
+				//kill();
     }
 
     /**
@@ -68,7 +119,18 @@ public class Semaforo {
      */
     public static void main(String[] args) {
 				//System.out.println(args[0]);
-        new Semaforo(Integer.parseInt(args[0]));
+        id = Integer.parseInt(args[0]);
+        n= Integer.parseInt(args[1]);
+        initialDelay = Integer.parseInt(args[2]);
+        if(args[3].equals("true")){
+          bearer =true;
+        }else{
+          bearer = false;
+        }
+
+
+        new Semaforo(id,n,initialDelay,bearer);
+
 				System.out.println("En codigo main");
 				System.exit(1);
         //new Semaforo(Integer.parseInt(args[0]), Integer.parseInt(args[1])));

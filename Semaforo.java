@@ -24,7 +24,7 @@ public class Semaforo {
     private static int n;
     private static int initialDelay;
     private static boolean bearer;
-		InterfazToken token;
+		//InterfazToken token;
 		InterfazLista lista;
 		InterfazProceso proceso;
 
@@ -45,8 +45,8 @@ public class Semaforo {
           Thread a = new Thread(){
             public void run(){
               try{
-                token = new Token(n);
-                Naming.rebind("//localhost/Token",token);
+                //token = new Token(n);
+                //Naming.rebind("//localhost/Token",token);
                 InterfazLista lista = new Lista();
                 Naming.rebind ("//localhost/Lista", lista);
                 System.out.println("Lista RMI Creada");
@@ -81,8 +81,8 @@ public class Semaforo {
 		// Naming.lookup() obtiene el objeto remoto
 
 						/*
-						TheToken thetoken = new TheToken(n_);
-						IntObjeto AToken = new OToken("//localhost/OToken",n_,thetoken);
+						Token token = new Token(n_);
+						IntObjeto AToken = new OToken("//localhost/OToken",n_,token);
 						Naming.rebind("//localhost/OToken", AToken);
 						*/
 						//No puedo realizar lo de arriba... por que me tira un error de que no
@@ -90,13 +90,13 @@ public class Semaforo {
 						//Creo que tendre que asociar a una "interfaz Remota", para poder
 						//registrar ese, y utilizar el Serializable.
 
-						System.out.println("TheToken Created");
-            token = (InterfazToken)Naming.lookup ("//localhost/Token");
+						System.out.println("Token Created");
+            //token = (InterfazToken)Naming.lookup ("//localhost/Token");
 						lista = (InterfazLista)Naming.lookup ("//localhost/Lista");
 						lista.setSize(n_);
 						proceso = new Proceso(id);
 						if(bearer){
-								TheToken tokenmaestro = new TheToken(n_);
+								Token tokenmaestro = new Token(n_);
 								System.out.println("creando token maestro");
 								proceso.asignToken(tokenmaestro);
 						}
@@ -120,11 +120,13 @@ public class Semaforo {
 
 						passToken(id+1);
             System.out.println(Verdeblanco+"   Estoy ocioso         "+resetColor);
+						/*
 						boolean sali=token.freeToken(id);
             if(sali){
               System.out.println("algo !!");
               Thread.sleep(100000);
             }
+						*/
         }
         catch (Exception e)
         {
@@ -213,6 +215,7 @@ public class Semaforo {
 				}
 		}
 
+		/*
 		public void takeToken(InterfazToken token){
 			try{
 				token.soyDe(id);
@@ -221,6 +224,7 @@ public class Semaforo {
 				e.printStackTrace();
 			}
 		}
+		*/
 
 		public void kill(){
 				try{
@@ -238,7 +242,7 @@ public class Semaforo {
 		public void passToken(int id_proc){
 				try{
 						if(id_proc < n){
-								TheToken aux = proceso.getToken();
+								Token aux = proceso.getToken();
 								InterfazProceso proc = 
 									(InterfazProceso)Naming.lookup ("//localhost/Proceso"+id_proc);
 								proc.asignToken(aux);

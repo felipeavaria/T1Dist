@@ -2,7 +2,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TheToken implements Serializable {
+public class Token implements Serializable {
 
 		private int[] LN;
 		private int nProc;
@@ -11,7 +11,7 @@ public class TheToken implements Serializable {
     /**
      * Constructor del Token
      */
-    public TheToken(int nProcesos){
+    public Token(int nProcesos){
 				nProc = nProcesos;
 
 				LN = new int[nProc];
@@ -28,10 +28,10 @@ public class TheToken implements Serializable {
      * Creación del token (solo 1 vez), a traves de variable "creado"
      * @return El token al ser creado, null si es que no lo ha sido.
      */
-    public static TheToken crear(int nProc){
+    public static Token crear(int nProc){
         if (!creado){
             creado = true;
-            return new TheToken(nProc);
+            return new Token(nProc);
         }
         return null;
     }

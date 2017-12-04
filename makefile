@@ -10,6 +10,7 @@ CLASSPATH = ./
 	$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
+	TheToken.java \
 	IntObjeto.java \
 	InterfazProceso.java \
 	InterfazLista.java \
@@ -17,7 +18,6 @@ CLASSES = \
 	Proceso.java \
 	Lista.java \
 	Token.java \
-	TheToken.java \
 	OToken.java \
 	Servidor.java \
 	Semaforo.java

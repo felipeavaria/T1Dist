@@ -50,6 +50,8 @@ public class Semaforo {
                 InterfazLista lista = new Lista();
                 Naming.rebind ("//localhost/Lista", lista);
                 System.out.println("Lista RMI Creada");
+
+
                 //LocateRegistry.createRegistry(1099);
                 System.out.println("LocateRegistry ready");
                 System.out.println("creando token");
@@ -77,10 +79,12 @@ public class Semaforo {
 		// Debe reemplazarse "localhost" por el nombre o ip donde
 		// este corriendo "rmiregistry".
 		// Naming.lookup() obtiene el objeto remoto
-            //InterfazToken token =
-						IntObjeto AToken = new OToken(listsize);
+
+						/*
+						TheToken thetoken = new TheToken(n_);
+						IntObjeto AToken = new OToken("//localhost/OToken",n_,thetoken);
 						Naming.rebind("//localhost/OToken", AToken);
-            //Naming.rebind ("//localhost/TheToken", thetoken);
+						*/
 						//No puedo realizar lo de arriba... por que me tira un error de que no
 						//es algo remoto.
 						//Creo que tendre que asociar a una "interfaz Remota", para poder
@@ -89,13 +93,21 @@ public class Semaforo {
 						System.out.println("TheToken Created");
             token = (InterfazToken)Naming.lookup ("//localhost/Token");
 						lista = (InterfazLista)Naming.lookup ("//localhost/Lista");
-						lista.setSize(listsize);
+						lista.setSize(n_);
 						proceso = new Proceso(id);
+						if(bearer){
+								TheToken tokenmaestro = new TheToken(n_);
+								proceso.asignToken(tokenmaestro);
+						}
+						Naming.rebind ("//localhost/Proceso"+id_, proceso);
+
+
 						System.out.println ("Añaidendo proceso...");
 						addToList(proceso);
 						System.out.println ("Esperando al resto de los procesos...");
 						waitStart();
 						System.out.println ("Listaylor");
+						request(id, 1);
             
             // Se realiza la suma remota.
             ///System.out.print ("2 + 3 = ");
@@ -159,9 +171,19 @@ public class Semaforo {
 		}
 
 		public void request(int id, int seq){
-
+			for(int i=0; i<n; i++){
+				if(i != id){
+					String url = "//localhost/Proceso"+i;
+					try{
+						InterfazProceso aux = (InterfazProceso)Naming.lookup (url);
+						aux.print("Si.... proceso "+id+" me esta webeando");
+					}
+					catch (Exception e){
+						e.printStackTrace();
+					}
+				}
+			}
 		}
-
 
 /*
     waitStart funcion que espera, al resto de los procesos para iniciar algoritmo*/
@@ -220,6 +242,18 @@ public class Semaforo {
 						e.printStackTrace();
 				}
 				System.out.println("x2");
+		}
+
+		public void passToken(int id_proc){
+				try{
+						TheToken aux = proceso.getToken();
+						InterfazProceso proc = 
+							(InterfazProceso)Naming.lookup ("//localhost/Proceso"+id_proc);
+						proc.asignToken(aux);
+				}
+				catch (Exception e){
+						e.printStackTrace();
+				}
 		}
 
 }

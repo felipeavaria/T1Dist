@@ -11,11 +11,13 @@ public class Proceso extends UnicastRemoteObject implements InterfazProceso
    * @throws RemoteException
    */
   private int id;
+	private TheToken token = null;
   public static int procesosInstanciado =0;
   public Proceso (int id_) throws RemoteException
   {
       super();
 			id = id_;
+
       //procesosInstanciado++;
       //return procesosInstanciado;
   }
@@ -24,4 +26,19 @@ public class Proceso extends UnicastRemoteObject implements InterfazProceso
   {
     return procesosInstanciado;
   }
+
+	public void print(String aux){
+			System.out.println(aux);
+	}
+
+	public TheToken getToken(){
+			TheToken aux = token;
+			token = null;
+			return aux;
+	}
+
+	public void asignToken(TheToken token_){
+			token = token_;
+	}
+
 }

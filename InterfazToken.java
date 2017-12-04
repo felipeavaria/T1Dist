@@ -17,6 +17,7 @@ public interface InterfazToken extends Remote {
     public void getToken(int p)throws RemoteException;
     public boolean available (int p) throws RemoteException;
     public boolean freeToken (int p) throws RemoteException;
+		public TheToken getToken2() throws RemoteException;
 }
 
 

@@ -27,6 +27,7 @@ public class Token extends UnicastRemoteObject implements InterfazToken
 		private int n;
 		private int procesoActual;
 		private boolean Taken = false;
+		private TheToken thetoken;
     public Token (int n) throws RemoteException
     {
         //super();
@@ -61,7 +62,7 @@ public class Token extends UnicastRemoteObject implements InterfazToken
 
 				colaProcesos.add(p);
 				System.out.println("en cola "+ p + " size = "+colaProcesos.size());
-				LN[p-1]=1;
+				LN[p]=1;
 		}
 
 		public boolean available(int p){
@@ -100,6 +101,10 @@ public class Token extends UnicastRemoteObject implements InterfazToken
 			}
 			System.out.println("suma = "+ aux);
 			return aux;
+		}
+
+		public TheToken getToken2(){
+			return thetoken;
 		}
 
 }

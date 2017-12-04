@@ -5,6 +5,7 @@ import java.util.List;
 public class Token implements Serializable {
 
 		private int[] LN;
+		private ArrayList<Integer> Q;
 		private int nProc;
     private static boolean creado = false;
 
@@ -15,6 +16,7 @@ public class Token implements Serializable {
 				nProc = nProcesos;
 
 				LN = new int[nProc];
+				Q = new ArrayList<Integer>();
 				int aux=0;
 				for (int i=0; i<nProc; i++){
 					aux = aux+LN[i];
@@ -33,6 +35,26 @@ public class Token implements Serializable {
         }
         return null;
     }
+
+		public void queve(int proc){
+				Q.add(proc);
+				System.out.print("[");
+				for(int i=0; i<Q.size(); i++){
+					System.out.print(Q.get(i)+"-");
+				}
+				System.out.println("]");
+		}
+
+		public int QLength(){
+				return Q.size();
+		}
+
+		public int getNextQ(){
+				int aux = Q.get(0);
+				Q.remove(0);
+				return aux;
+		}
+
 
     public int[] get_LN() {
         return LN;

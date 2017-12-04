@@ -39,7 +39,6 @@ public class Semaforo {
         initialDelay =initialDelay_;
         bearer =bearer_;
         if(bearer){
-          //crear el token
           Thread a = new Thread(){
 							public void run(){
 									try{
@@ -70,7 +69,7 @@ public class Semaforo {
         {
 						lista = (InterfazLista)Naming.lookup ("//localhost/Lista");
 						lista.setSize(n_);
-						proceso = new Proceso(id);
+						proceso = new Proceso(id, n_);
 						if(bearer){
 								Token tokenmaestro = new Token(n_);
 								System.out.println("creando token maestro");
@@ -82,24 +81,24 @@ public class Semaforo {
 						addToList(proceso);
 						System.out.println ("Esperando al resto de los procesos...");
 						waitStart();
-						System.out.println ("Listaylor");
-						request(id, 1);
+
+            System.out.println(Verdeblanco+"   Estoy ocioso         "+resetColor);
+						Thread.sleep(initialDelay_);
             
             System.out.println (AmarilloNegro+"   Esperando el Token   "+resetColor);
+						request(id, 1); //Solicitud a Otros Procesos, de entrar a la Zona Critica
 
             waitToken();
-						//takeToken(token);
             System.out.println(RojoBlanco+"   En Zona Critica      "+ resetColor);
-						//Thread.sleep(timeout);
-						Thread.sleep(initialDelay);
+						Thread.sleep(500); //Zona Critica
 
-						passToken(id+1);
             System.out.println(Verdeblanco+"   Estoy ocioso         "+resetColor);
+						passToken();
+						Thread.sleep(1000000000);
 						/*
 						boolean sali=token.freeToken(id);
             if(sali){
               System.out.println("algo !!");
-              Thread.sleep(100000);
             }
 						*/
         }
@@ -143,12 +142,19 @@ public class Semaforo {
 	 * algoritmo de Susuki-Kazami
 	 */
 		public void request(int id, int seq){
+			try{
+					proceso.takeRequest(id);
+			}
+			catch (Exception e){
+					e.printStackTrace();
+			}
 			for(int i=0; i<n; i++){
 				if(i != id){
 					String url = "//localhost/Proceso"+i;
 					try{
 						InterfazProceso aux = (InterfazProceso)Naming.lookup (url);
-						aux.print("Si.... proceso "+id+" me esta webeando");
+						//aux.print("Si.... proceso "+id+" me esta webeando");
+						aux.takeRequest(id);
 					}
 					catch (Exception e){
 						e.printStackTrace();
@@ -180,6 +186,7 @@ public class Semaforo {
 */
 		public void waitToken(){
 				boolean asd = true;
+				System.out.println("en waittoken");
 				while(asd){
 						try{
 								asd = !proceso.hasToken();
@@ -226,13 +233,22 @@ public class Semaforo {
  * *** Este metodo, tiene que de alguna manera, utilizarse con "TakeToken", para
  * obtener el token ***
  * */
-		public void passToken(int id_proc){
+		public void passToken(){
+				boolean asdf = true;
 				try{
-						if(id_proc < n){
-								Token aux = proceso.getToken();
-								InterfazProceso proc = 
-									(InterfazProceso)Naming.lookup ("//localhost/Proceso"+id_proc);
-								proc.asignToken(aux);
+						while(asdf){
+								Thread.sleep(100);
+								if(proceso.tokenHasQ()){
+										asdf = false;
+										int id_proc = proceso.nextProcess();
+										if(id_proc < n){
+												Token aux = proceso.getToken();
+												InterfazProceso proc = 
+													(InterfazProceso)Naming.lookup ("//localhost/Proceso"+id_proc);
+												proc.asignToken(aux);
+												System.out.println("pasando token a "+id_proc);
+										}
+								}
 						}
 				}
 				catch (Exception e){

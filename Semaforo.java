@@ -97,6 +97,7 @@ public class Semaforo {
 						proceso = new Proceso(id);
 						if(bearer){
 								TheToken tokenmaestro = new TheToken(n_);
+								System.out.println("creando token maestro");
 								proceso.asignToken(tokenmaestro);
 						}
 						Naming.rebind ("//localhost/Proceso"+id_, proceso);
@@ -109,20 +110,15 @@ public class Semaforo {
 						System.out.println ("Listaylor");
 						request(id, 1);
             
-            // Se realiza la suma remota.
-            ///System.out.print ("2 + 3 = ");
-						// a traves
-						// de objetoRemoto, el servidor realiza el metodo suma (no el cliente), y tengo la
-						// respuesta a través de este
-            ///System.out.println (Token.suma(2,3));
             System.out.println (AmarilloNegro+"   Esperando el Token   "+resetColor);
 
             waitToken();
-						takeToken(token);
+						//takeToken(token);
             System.out.println(RojoBlanco+"   En Zona Critica      "+ resetColor);
-
 						//Thread.sleep(timeout);
 						Thread.sleep(initialDelay);
+
+						passToken(id+1);
             System.out.println(Verdeblanco+"   Estoy ocioso         "+resetColor);
 						boolean sali=token.freeToken(id);
             if(sali){
@@ -205,21 +201,16 @@ public class Semaforo {
     waitToken funcion que espera el token, inicialmente hace un peticion y esta queda en colada
 */
 		public void waitToken(){
-			boolean asd = true;
-      try{
-        token.getToken(id);
-      }catch(Exception e){
-        e.printStackTrace();
-      }
-			while(asd){
-				try{
-					asd = !token.available(id);
-					Thread.sleep(100);
+				boolean asd = true;
+				while(asd){
+						try{
+								asd = !proceso.hasToken();
+								Thread.sleep(100);
+						}
+						catch(Exception e){
+								e.printStackTrace();
+						}
 				}
-				catch(Exception e){
-					e.printStackTrace();
-				}
-			}
 		}
 
 		public void takeToken(InterfazToken token){
@@ -246,14 +237,17 @@ public class Semaforo {
 
 		public void passToken(int id_proc){
 				try{
-						TheToken aux = proceso.getToken();
-						InterfazProceso proc = 
-							(InterfazProceso)Naming.lookup ("//localhost/Proceso"+id_proc);
-						proc.asignToken(aux);
+						if(id_proc < n){
+								TheToken aux = proceso.getToken();
+								InterfazProceso proc = 
+									(InterfazProceso)Naming.lookup ("//localhost/Proceso"+id_proc);
+								proc.asignToken(aux);
+						}
 				}
 				catch (Exception e){
 						e.printStackTrace();
 				}
 		}
-
 }
+
+

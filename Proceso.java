@@ -37,6 +37,13 @@ public class Proceso extends UnicastRemoteObject implements InterfazProceso
 			return aux;
 	}
 
+	public boolean hasToken() {
+			if(token != null){
+					return true;
+			}
+			return false;
+	}
+
 	public void asignToken(TheToken token_){
 			token = token_;
 	}

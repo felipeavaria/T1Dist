@@ -16,5 +16,6 @@ public interface InterfazProceso extends Remote {
 		public void print(String aux) throws RemoteException;
 		public TheToken getToken() throws RemoteException;
 		public void asignToken(TheToken token_) throws RemoteException;
+		public boolean hasToken() throws RemoteException;
 }
 

@@ -32,7 +32,8 @@ public class Semaforo {
 		// este corriendo "rmiregistry".
 		// Naming.lookup() obtiene el objeto remoto
             //InterfazToken token =
-						TheToken thetoken = new TheToken(listsize);
+						IntObjeto AToken = new OToken(listsize);
+						Naming.rebind("//localhost/OToken", AToken);
             //Naming.rebind ("//localhost/TheToken", thetoken);
 						//No puedo realizar lo de arriba... por que me tira un error de que no
 						//es algo remoto.

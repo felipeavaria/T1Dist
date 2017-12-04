@@ -36,6 +36,9 @@ public class Token implements Serializable {
         return null;
     }
 
+    /**
+     * Método del Token, para poder encolar valores en Q.
+     */
 		public void queve(int proc){
 				Q.add(proc);
 				System.out.print("[");
@@ -45,18 +48,37 @@ public class Token implements Serializable {
 				System.out.println("]");
 		}
 
+    /**
+     * Retorna el largo de la lista Q, es utilizado para calculos en procesos.
+     * @return Largo de la lista Q.
+     */
 		public int QLength(){
 				return Q.size();
 		}
 
+    /**
+     * Devuelve elemento de la lista que haya ingresado antes, de la forma FIFO.
+     * @return N° de proceso, al cual le toca estar en la Seccion Critica
+     */
 		public int getNextQ(){
 				int aux = Q.get(0);
 				Q.remove(0);
 				return aux;
 		}
 
-
+    /**
+     * Funcion, que retorna la lista LN del Token; Utilizado para calculos en 
+		 * los procesos.
+     * @return Arreglo LN() del Token
+     */
     public int[] get_LN() {
         return LN;
     }
+
+    /**
+     *  Edita valores de LN(), esto sirve cuando se tiene numeros de secuencia.
+     */
+		public void set_LN(int proc, int value) {
+				LN[proc] = value;
+		}
 }

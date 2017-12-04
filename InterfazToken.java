@@ -18,3 +18,29 @@ public interface InterfazToken extends Remote {
     public boolean available (int p) throws RemoteException;
     public boolean freeToken (int p) throws RemoteException;
 }
+
+
+/*
+public interface InterfazToken2 extends Serializable
+{
+    public int getSumando1();
+    public int getSumando2();
+}
+
+
+public class Token implements InterfazToken2
+{
+    private int a=0;
+    private int b=0;
+    public Sumando (int a, int b)    {
+        this.a=a;
+        this.b=b;
+    }
+    public int getSumando1()    {
+        return a;
+    }
+    public int getSumando2()    {
+        return b;
+    }
+}
+*/

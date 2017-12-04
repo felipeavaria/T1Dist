@@ -78,11 +78,23 @@ public class Semaforo {
 		// este corriendo "rmiregistry".
 		// Naming.lookup() obtiene el objeto remoto
             //InterfazToken token =
+						IntObjeto AToken = new OToken(listsize);
+						Naming.rebind("//localhost/OToken", AToken);
+            //Naming.rebind ("//localhost/TheToken", thetoken);
+						//No puedo realizar lo de arriba... por que me tira un error de que no
+						//es algo remoto.
+						//Creo que tendre que asociar a una "interfaz Remota", para poder
+						//registrar ese, y utilizar el Serializable.
+
+						System.out.println("TheToken Created");
             token = (InterfazToken)Naming.lookup ("//localhost/Token");
 						lista = (InterfazLista)Naming.lookup ("//localhost/Lista");
+						lista.setSize(listsize);
 						proceso = new Proceso(id);
 						System.out.println ("Añaidendo proceso...");
 						addToList(proceso);
+						System.out.println ("Esperando al resto de los procesos...");
+						waitStart();
 						System.out.println ("Listaylor");
             
             // Se realiza la suma remota.
@@ -149,6 +161,23 @@ public class Semaforo {
 		public void request(int id, int seq){
 
 		}
+
+
+/*
+    waitStart funcion que espera, al resto de los procesos para iniciar algoritmo*/
+		public void waitStart(){
+			boolean start = false;
+			while(!start){
+				try{
+					start = lista.start();
+					Thread.sleep(100);
+				}
+				catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+
 
 /*
     waitToken funcion que espera el token, inicialmente hace un peticion y esta queda en colada

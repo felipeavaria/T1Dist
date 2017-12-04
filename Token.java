@@ -20,8 +20,6 @@ public class Token implements Serializable {
 					aux = aux+LN[i];
 				}
 				System.out.println("suma = "+ aux);
-				//return aux;
-
     }
 
     /**

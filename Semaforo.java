@@ -24,7 +24,6 @@ public class Semaforo {
     private static int n;
     private static int initialDelay;
     private static boolean bearer;
-		//InterfazToken token;
 		InterfazLista lista;
 		InterfazProceso proceso;
 
@@ -32,8 +31,7 @@ public class Semaforo {
     private String Verdeblanco ="\u001B[42m"+"\u001B[37m";
     private String RojoBlanco ="\u001B[41m"+"\u001B[37m";
     private String AmarilloNegro="\u001B[43m"+"\u001B[30m";
-		// private int timeout;
-    //public Semaforo(int id_)
+
     public Semaforo(int id_, int n_ , int initialDelay_ ,boolean bearer_)
     {
 				id = id_;
@@ -43,55 +41,33 @@ public class Semaforo {
         if(bearer){
           //crear el token
           Thread a = new Thread(){
-            public void run(){
-              try{
-                //token = new Token(n);
-                //Naming.rebind("//localhost/Token",token);
-                InterfazLista lista = new Lista();
-                Naming.rebind ("//localhost/Lista", lista);
-                System.out.println("Lista RMI Creada");
+							public void run(){
+									try{
+										InterfazLista lista = new Lista();
+										Naming.rebind ("//localhost/Lista", lista);
+										System.out.println("Lista RMI Creada");
 
-
-                //LocateRegistry.createRegistry(1099);
-                System.out.println("LocateRegistry ready");
-                System.out.println("creando token");
-                  System.out.println("hola");
-                Thread.sleep(100000);
-                System.out.println("chao");
-              }catch ( Exception a) {
-                a.printStackTrace();
-              }
-            }
+										//LocateRegistry.createRegistry(1099);
+										System.out.println("LocateRegistry ready");
+										System.out.println("creando token");
+											System.out.println("hola");
+										Thread.sleep(100000);
+										System.out.println("chao");
+									}catch ( Exception a) {
+										a.printStackTrace();
+									}
+							}
           };
           a.start();
           try{
-            Thread.sleep(1000);
+							Thread.sleep(1000);
           }catch (Exception e) {
-            e.printStackTrace();
+							e.printStackTrace();
           }
-
-        }else{
-
         }
+
         try
         {
-		// Lugar en el que esta el objeto remoto.
-		// Debe reemplazarse "localhost" por el nombre o ip donde
-		// este corriendo "rmiregistry".
-		// Naming.lookup() obtiene el objeto remoto
-
-						/*
-						Token token = new Token(n_);
-						IntObjeto AToken = new OToken("//localhost/OToken",n_,token);
-						Naming.rebind("//localhost/OToken", AToken);
-						*/
-						//No puedo realizar lo de arriba... por que me tira un error de que no
-						//es algo remoto.
-						//Creo que tendre que asociar a una "interfaz Remota", para poder
-						//registrar ese, y utilizar el Serializable.
-
-						System.out.println("Token Created");
-            //token = (InterfazToken)Naming.lookup ("//localhost/Token");
 						lista = (InterfazLista)Naming.lookup ("//localhost/Lista");
 						lista.setSize(n_);
 						proceso = new Proceso(id);
@@ -101,7 +77,6 @@ public class Semaforo {
 								proceso.asignToken(tokenmaestro);
 						}
 						Naming.rebind ("//localhost/Proceso"+id_, proceso);
-
 
 						System.out.println ("Añaidendo proceso...");
 						addToList(proceso);
@@ -149,13 +124,8 @@ public class Semaforo {
         }else{
           bearer = false;
         }
-
-
         new Semaforo(id,n,initialDelay,bearer);
-
-				System.out.println("En codigo main");
 				System.exit(1);
-        //new Semaforo(Integer.parseInt(args[0]), Integer.parseInt(args[1])));
     }
 
 		public void addToList(InterfazProceso proceso){
@@ -168,6 +138,10 @@ public class Semaforo {
 			}
 		}
 
+	/**
+	 * Envia mensaje "request" al resto de los procesos, para aplicar el
+	 * algoritmo de Susuki-Kazami
+	 */
 		public void request(int id, int seq){
 			for(int i=0; i<n; i++){
 				if(i != id){
@@ -183,8 +157,9 @@ public class Semaforo {
 			}
 		}
 
-/*
-    waitStart funcion que espera, al resto de los procesos para iniciar algoritmo*/
+/**
+ * Función que espera, al resto de los procesos para iniciar algoritmo
+ */
 		public void waitStart(){
 			boolean start = false;
 			while(!start){
@@ -199,8 +174,9 @@ public class Semaforo {
 		}
 
 
-/*
-    waitToken funcion que espera el token, inicialmente hace un peticion y esta queda en colada
+/**
+ * Método que espera, que el proceso realcionado con este Semaforo,
+ * obtenga el Token para entrar a la Zona Critica
 */
 		public void waitToken(){
 				boolean asd = true;
@@ -215,6 +191,11 @@ public class Semaforo {
 				}
 		}
 
+		/* ESTE METODO TIENE QUE ESTAR EN EL SEMAFORO!!!!*/
+/**
+ * Método de Semaforo/Proceso, el cual toma el Token, una vez que este es
+ * liberado por otro proceso.
+ */
 		/*
 		public void takeToken(InterfazToken token){
 			try{
@@ -226,10 +207,12 @@ public class Semaforo {
 		}
 		*/
 
+/**
+ * Método que termina la ejecución del proceso; necesario para terminar
+ * con la ejecución del algoritmo Susuki-Kazami.
+ */
 		public void kill(){
 				try{
-						//int pos = lista_.indexOf(proceso);
-						//System.out.println("elimiando proceso en posicion: "+proceso);
 						lista.killProceso(proceso);
 						System.out.println("eliminacion lista");
 				}
@@ -239,6 +222,10 @@ public class Semaforo {
 				System.out.println("x2");
 		}
 
+/**
+ * *** Este metodo, tiene que de alguna manera, utilizarse con "TakeToken", para
+ * obtener el token ***
+ * */
 		public void passToken(int id_proc){
 				try{
 						if(id_proc < n){

@@ -87,7 +87,7 @@ public class Semaforo {
 
               }
 
-              Naming.rebind ("//localhost/Proceso"+id_, proceso);
+						request(id, proceso.secuencia()); //Solicitud a Otros Procesos, de entrar a la Zona Critica
 
               System.out.println ("Añaidendo proceso...");
               addToList(proceso);
@@ -204,7 +204,7 @@ public class Semaforo {
 	 */
 		public void request(int id, int seq){
 			try{
-					proceso.takeRequest(id);
+					proceso.takeRequest(id, seq);
 			}
 			catch (Exception e){
 					e.printStackTrace();
@@ -214,7 +214,9 @@ public class Semaforo {
 					String url = "//localhost/Proceso"+i;
 					try{
 						InterfazProceso aux = (InterfazProceso)Naming.lookup (url);
-						aux.takeRequest(id);
+						//aux.print("Si.... proceso "+id+" me esta webeando");
+						if(!aux.takeRequest(id, seq)) 
+							System.out.println("No se cumple condición de algoritmo, request esta outdated");
 					}
 					catch (Exception e){
 						e.printStackTrace();
@@ -302,6 +304,7 @@ public class Semaforo {
 										asdf = false;
 										int id_proc = proceso.nextProcess();
 										if(id_proc < n){
+												proceso.actualizarLN();
 												Token aux = proceso.getToken();
 												InterfazProceso proc =
 													(InterfazProceso)Naming.lookup ("//localhost/Proceso"+id_proc);

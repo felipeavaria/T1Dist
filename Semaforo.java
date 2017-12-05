@@ -69,6 +69,7 @@ public class Semaforo {
         }
         boolean espero=true;
         boolean gate =true;
+				boolean gate2 =true;
         while (espero) {
           try
           {
@@ -78,7 +79,10 @@ public class Semaforo {
 
               lista = (InterfazLista)Naming.lookup ("//localhost/Lista");
               lista.setSize(n_);
-              proceso = new Proceso(id, n_);
+							if(gate2){
+								proceso = new Proceso(id, n_);
+							}
+
               if(bearer){
                   Token tokenmaestro = new Token(n_);
                   //System.out.println("creando token maestro");
@@ -86,20 +90,23 @@ public class Semaforo {
                   bearer=false;
 
               }
+							Naming.rebind("//localhost/Proceso"+id_,proceso);
 
-						request(id, proceso.secuencia()); //Solicitud a Otros Procesos, de entrar a la Zona Critica
 
               System.out.println ("Añaidendo proceso...");
               addToList(proceso);
+							if(gate2){
+								  waitStart();
+							}
 
-              waitStart();
 
 
               System.out.println(Verdeblanco+"   Estoy ocioso         "+resetColor);
               Thread.sleep(initialDelay);
 
               System.out.println (AmarilloNegro+"   Esperando el Token   "+resetColor);
-              request(id, 1); //Solicitud a Otros Procesos, de entrar a la Zona Critica
+							request(id, proceso.secuencia()); //Solicitud a Otros Procesos, de entrar a la Zona Critica
+
               if(!proceso.hasToken()){
                   waitToken();
               }
@@ -114,7 +121,7 @@ public class Semaforo {
               if(delay2>0){
                 initialDelay=delay2;
                 delay2=0;
-
+								gate2 = false;
                 espero=true;
               }else{
                 boolean todosTerminaron=false;
@@ -215,7 +222,7 @@ public class Semaforo {
 					try{
 						InterfazProceso aux = (InterfazProceso)Naming.lookup (url);
 						//aux.print("Si.... proceso "+id+" me esta webeando");
-						if(!aux.takeRequest(id, seq)) 
+						if(!aux.takeRequest(id, seq))
 							System.out.println("No se cumple condición de algoritmo, request esta outdated");
 					}
 					catch (Exception e){
@@ -312,8 +319,7 @@ public class Semaforo {
 												System.out.println("pasando token a "+id_proc);
 
 										}
-								}
-                if(proceso.soyUltimo()){
+								}else if(proceso.soyUltimo()){
                   asdf =false;
                 }
 						}

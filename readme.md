@@ -10,8 +10,6 @@ El comando "make" es el que controla la mayoria del codigo:
 
 make : compila los archivos
 make rmi: corre el comando rmiregister, este debe ser utilizado en la misma carpeta de los archivos
-make servidor: corre el servidor
-make cliente: corre el cliente
 make clean: limpia los archivos .class
 
 
@@ -41,8 +39,12 @@ make clean: limpia los archivos .class
 ## Ejemplo
 
 consola 1: correr "make", es espera la compliación y luego "make rmi", se espera 1 segundo aprox. y esta corriendo.
-consola 2: correr "java Semaforo 0 3 3000,2000 false"
-consola 3: correr "java Semaforo 1 3 4000 true"
-consola 4: correr "java Semaforo 2 3 9000 false"
+consola 2: correr "java Semaforo 0 3 3000,2000 false" o "make proceso 0 3 3000,2000 false"
+consola 3: correr "java Semaforo 1 3 4000 true" o "make proceso 1 3 4000 true"
+consola 4: correr "java Semaforo 2 3 9000 false" o "make proceso 2 3 9000 true"
+(para el caso del uso de make proceso tiene un error que no corresponde...
+  error : makefile:66: fallo en las instrucciones para el objetivo 'proceso'
+make: *** [proceso] Error 1)
 
-Donde el procesos 0 corre su primera SC. primero, luego lo hace 1 y vuelve a 0, finalmente lo recibe el proceso 2. 
+
+Donde el procesos 0 corre su primera SC. primero, luego lo hace 1 y vuelve a 0, finalmente lo recibe el proceso 2.

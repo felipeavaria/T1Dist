@@ -21,7 +21,7 @@ public class Token implements Serializable {
 				for (int i=0; i<nProc; i++){
 					aux = aux+LN[i];
 				}
-				System.out.println("suma = "+ aux);
+				//System.out.println("suma = "+ aux);
     }
 
     /**
@@ -38,9 +38,9 @@ public class Token implements Serializable {
 
 		public void queve(int proc){
 				Q.add(proc);
-				System.out.print("[");
-				for(int i=0; i<Q.size(); i++){
-					System.out.print(Q.get(i)+"-");
+				System.out.print("["+Q.get(0));
+				for(int i=1; i<Q.size(); i++){
+					System.out.print("-"+Q.get(i));
 				}
 				System.out.println("]");
 		}

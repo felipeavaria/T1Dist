@@ -12,8 +12,11 @@ import java.io.Serializable;
  * @author  Javier Abellan
  */
 public interface InterfazProceso extends Remote {
-    public int getProceso() throws RemoteException;
+
+
 		public void print(String aux) throws RemoteException;
+    public boolean imFinish(int proc) throws RemoteException;
+    public boolean soyUltimo()throws RemoteException;
 		public void takeRequest(int proc) throws RemoteException;
 		public boolean tokenHasQ() throws RemoteException;
 		public int nextProcess() throws RemoteException;
@@ -21,4 +24,3 @@ public interface InterfazProceso extends Remote {
 		public void asignToken(Token token_) throws RemoteException;
 		public boolean hasToken() throws RemoteException;
 }
-

@@ -27,25 +27,25 @@ public class Lista extends UnicastRemoteObject implements InterfazLista
 			if(!size_activated){
 					list_size = size;
 					size_activated = true;
-		}	
-		System.out.println("size of list: "+list_size);
+		}
+		//System.out.println("size of list: "+list_size);
 	}
 
-	public boolean start() throws RemoteException 
+	public boolean start() throws RemoteException
 	{
 			if(ProcessList.size() >= list_size){
 					return true;
 			}
-			return false;	
+			return false;
 	}
 
-	public void addProceso(InterfazProceso proceso) throws RemoteException 
+	public void addProceso(InterfazProceso proceso) throws RemoteException
 	{
 			ProcessList.add(proceso);
-			System.out.println("Largo de lista: "+ProcessList.size());
+			//System.out.println("Largo de lista: "+ProcessList.size());
 	}
 
-	public void killProceso(InterfazProceso proc) throws RemoteException 
+	public void killProceso(InterfazProceso proc) throws RemoteException
 	{
 			int pos = ProcessList.indexOf(proc);
 			System.out.println("eliminando de posicion: "+pos);

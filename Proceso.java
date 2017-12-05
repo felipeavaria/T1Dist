@@ -13,27 +13,25 @@ public class Proceso extends UnicastRemoteObject implements InterfazProceso
   private int id;
 	private Token token = null;
 	private int[] RN;
-  public static int procesosInstanciado =0;
-  public Proceso (int id_, int size) throws RemoteException
+  private int[] finish;
+  private int size;
+
+  public Proceso (int id_, int size_) throws RemoteException
   {
       super();
 			id = id_;
+      size=size_;
 			RN = new int[size];
-
-			System.out.print("[");
-			for(int i=0; i<RN.length; i++){
-				System.out.print(RN[i]+"-");
+      finish = new int[size];
+			System.out.print("RN : ["+RN[0]);
+			for(int i=1; i<RN.length; i++){
+				System.out.print("-"+RN[i]);
 			}
 			System.out.println("]");
 
-      //procesosInstanciado++;
-      //return procesosInstanciado;
+
   }
 
-  public int getProceso () throws RemoteException
-  {
-    return procesosInstanciado;
-  }
 
 	public void print(String aux){
 			System.out.println(aux);
@@ -44,17 +42,53 @@ public class Proceso extends UnicastRemoteObject implements InterfazProceso
 			if(token != null && proc != id){
 					token.queve(proc);
 			}
-			
-			System.out.print("[");
-			for(int i=0; i<RN.length; i++){
-				System.out.print(RN[i]+"-");
+
+			System.out.print("RN : ["+RN[0]);
+			for(int i=1; i<RN.length; i++){
+				System.out.print("-"+RN[i]);
 			}
 			System.out.println("]");
 	}
 
+ /* funcion que permite indicar a los demas procesos que termine y a la vez revisa si los demas estan aun en ejecucion */
+  public boolean imFinish(int proc){
+    finish[proc]=1;
+    int aux=0;
+    for(int i=0;i<size;i++){
+      aux=aux+finish[i];
+    }
+    if(size == aux){
+      return true;
+    }
+    return false;
+  }
+
+  public int sumaArray(int[] array){
+      int aux=0;
+      for(int i=0;i<size;i++){
+        aux=aux+array[i];
+      }
+      return aux;
+  }
+
+
+  /* funcion que permite que un procesos sepa que es el ultimo por lo que esta en condiciones de terminar la ejecucion */
+  public boolean soyUltimo(){
+
+    int aux=0;
+    for(int i=0;i<size;i++){
+      aux=aux+finish[i];
+    }
+    if((size-1) == aux){
+
+      return true;
+    }
+    return false;
+  }
+
 	public boolean tokenHasQ(){
 			if(token != null){
-					if(token.QLength() > 0) return true;	
+					if(token.QLength() > 0) return true;
 			}
 			return false;
 	}

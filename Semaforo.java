@@ -9,6 +9,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Ejemplo de cliente rmi nocivo, para aprovecharse de un servidor sin
@@ -24,19 +25,21 @@ public class Semaforo {
     private static int n;
     private static int initialDelay;
     private static boolean bearer;
+    public static int delay2;
 		InterfazLista lista;
 		InterfazProceso proceso;
-
+    private Scanner sc;
     private String resetColor = "\u001B[0m";
     private String Verdeblanco ="\u001B[42m"+"\u001B[37m";
     private String RojoBlanco ="\u001B[41m"+"\u001B[37m";
     private String AmarilloNegro="\u001B[43m"+"\u001B[30m";
 
-    public Semaforo(int id_, int n_ , int initialDelay_ ,boolean bearer_)
+    public Semaforo(int id_, int n_ , int initialDelay_ ,boolean bearer_,int delay2_)
     {
 				id = id_;
         n = n_;
         initialDelay =initialDelay_;
+        delay2=delay2_;
         bearer =bearer_;
         if(bearer){
           Thread a = new Thread(){
@@ -49,9 +52,9 @@ public class Semaforo {
 										//LocateRegistry.createRegistry(1099);
 										System.out.println("LocateRegistry ready");
 										System.out.println("creando token");
-											System.out.println("hola");
+
 										Thread.sleep(100000);
-										System.out.println("chao");
+
 									}catch ( Exception a) {
 										a.printStackTrace();
 									}
@@ -64,48 +67,99 @@ public class Semaforo {
 							e.printStackTrace();
           }
         }
+        boolean espero=true;
+        boolean gate =true;
+        while (espero) {
+          try
+          {
+              if (gate) {
+                System.out.println ("Esperando al resto de los procesos...");
+              }
 
-        try
-        {
-						lista = (InterfazLista)Naming.lookup ("//localhost/Lista");
-						lista.setSize(n_);
-						proceso = new Proceso(id, n_);
-						if(bearer){
-								Token tokenmaestro = new Token(n_);
-								System.out.println("creando token maestro");
-								proceso.asignToken(tokenmaestro);
-						}
-						Naming.rebind ("//localhost/Proceso"+id_, proceso);
+              lista = (InterfazLista)Naming.lookup ("//localhost/Lista");
+              lista.setSize(n_);
+              proceso = new Proceso(id, n_);
+              if(bearer){
+                  Token tokenmaestro = new Token(n_);
+                  //System.out.println("creando token maestro");
+                  proceso.asignToken(tokenmaestro);
+                  bearer=false;
 
-						System.out.println ("Añaidendo proceso...");
-						addToList(proceso);
-						System.out.println ("Esperando al resto de los procesos...");
-						waitStart();
+              }
 
-            System.out.println(Verdeblanco+"   Estoy ocioso         "+resetColor);
-						Thread.sleep(initialDelay_);
-            
-            System.out.println (AmarilloNegro+"   Esperando el Token   "+resetColor);
-						request(id, 1); //Solicitud a Otros Procesos, de entrar a la Zona Critica
+              Naming.rebind ("//localhost/Proceso"+id_, proceso);
 
-            waitToken();
-            System.out.println(RojoBlanco+"   En Zona Critica      "+ resetColor);
-						Thread.sleep(500); //Zona Critica
+              System.out.println ("Añaidendo proceso...");
+              addToList(proceso);
 
-            System.out.println(Verdeblanco+"   Estoy ocioso         "+resetColor);
-						passToken();
-						Thread.sleep(1000000000);
-						/*
-						boolean sali=token.freeToken(id);
-            if(sali){
-              System.out.println("algo !!");
+              waitStart();
+
+
+              System.out.println(Verdeblanco+"   Estoy ocioso         "+resetColor);
+              Thread.sleep(initialDelay);
+
+              System.out.println (AmarilloNegro+"   Esperando el Token   "+resetColor);
+              request(id, 1); //Solicitud a Otros Procesos, de entrar a la Zona Critica
+              if(!proceso.hasToken()){
+                  waitToken();
+              }
+              System.out.println("Tengo el Token");
+              System.out.println(RojoBlanco+"   En Zona Critica      "+ resetColor);
+              Thread.sleep(1000); //Zona Critica
+
+              System.out.println(Verdeblanco+"   Estoy ocioso         "+resetColor);
+              passToken();
+
+              espero= false;
+              if(delay2>0){
+                initialDelay=delay2;
+                delay2=0;
+
+                espero=true;
+              }else{
+                boolean todosTerminaron=false;
+                while(!todosTerminaron){
+                  try{
+                    todosTerminaron = proceso.imFinish(id);
+                    for(int i=0; i<n; i++){
+              				if(i != id){
+              					String url = "//localhost/Proceso"+i;
+              					try{
+              						InterfazProceso aux = (InterfazProceso)Naming.lookup (url);
+              						//aux.print("Si.... proceso "+id+" me esta webeando");
+              						aux.imFinish(id);
+              					}
+              					catch (Exception e){
+              						e.printStackTrace();
+              					}
+              				}
+              			}
+
+                    Thread.sleep(1000);
+                  }catch (Exception e) {
+
+                  }
+                }
+                System.out.println("");
+
+              }
+
+
+          }
+          catch (Exception e)
+          {
+            try{
+              Thread.sleep(2000);
+              gate =false;
             }
-						*/
+            catch (Exception a)
+            {
+                a.printStackTrace();
+            }
+          }
+
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+
 
 				//kill();
     }
@@ -117,13 +171,20 @@ public class Semaforo {
 				//System.out.println(args[0]);
         id = Integer.parseInt(args[0]);
         n= Integer.parseInt(args[1]);
-        initialDelay = Integer.parseInt(args[2]);
+        String[] parts = args[2].split(",");
+        try{
+          delay2=Integer.parseInt(parts[1]);
+        }catch (Exception e) {
+          delay2=0;
+        }
+
+        initialDelay = Integer.parseInt(parts[0]);
         if(args[3].equals("true")){
           bearer =true;
         }else{
           bearer = false;
         }
-        new Semaforo(id,n,initialDelay,bearer);
+        new Semaforo(id,n,initialDelay,bearer,delay2);
 				System.exit(1);
     }
 
@@ -153,7 +214,6 @@ public class Semaforo {
 					String url = "//localhost/Proceso"+i;
 					try{
 						InterfazProceso aux = (InterfazProceso)Naming.lookup (url);
-						//aux.print("Si.... proceso "+id+" me esta webeando");
 						aux.takeRequest(id);
 					}
 					catch (Exception e){
@@ -186,7 +246,7 @@ public class Semaforo {
 */
 		public void waitToken(){
 				boolean asd = true;
-				System.out.println("en waittoken");
+				//System.out.println("en waittoken");
 				while(asd){
 						try{
 								asd = !proceso.hasToken();
@@ -243,12 +303,16 @@ public class Semaforo {
 										int id_proc = proceso.nextProcess();
 										if(id_proc < n){
 												Token aux = proceso.getToken();
-												InterfazProceso proc = 
+												InterfazProceso proc =
 													(InterfazProceso)Naming.lookup ("//localhost/Proceso"+id_proc);
 												proc.asignToken(aux);
 												System.out.println("pasando token a "+id_proc);
+
 										}
 								}
+                if(proceso.soyUltimo()){
+                  asdf =false;
+                }
 						}
 				}
 				catch (Exception e){
@@ -256,5 +320,3 @@ public class Semaforo {
 				}
 		}
 }
-
-

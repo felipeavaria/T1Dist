@@ -10,23 +10,17 @@ CLASSPATH = ./
 	$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
-	IntObjeto.java \
+	Token.java \
 	InterfazProceso.java \
 	InterfazLista.java \
-	InterfazToken.java \
 	Proceso.java \
 	Lista.java \
-	Token.java \
-	TheToken.java \
-	OToken.java \
-	Servidor.java \
 	Semaforo.java
 
 CLASSES2 = \
-	InterfazToken.java \
 	Token.java 
 
-default: clean classes classes2 
+default: clean classes 
 
 classes: $(CLASSES:.java=.class) \
 
@@ -56,4 +50,18 @@ servidor:
 rmi:
 	rmiregistry
 
+# If the first argument is "run"...
+ifeq (proceso,$(firstword $(MAKECMDGOALS)))
+  # use the rest as arguments for "proceso"
+  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  # ...and turn them into do-nothing targets
+  $(eval $(RUN_ARGS):;@:)
+endif
+
+java: # ...
+    # ...
+
+.PHONY: proceso
+proceso : java
+	java Semaforo $(RUN_ARGS)
 

@@ -24,7 +24,7 @@ public class Semaforo {
     private static int n;
     private static int initialDelay;
     private static boolean bearer;
-		InterfazToken token;
+		//private static BufferedReader br = null;
 		InterfazLista lista;
 		InterfazProceso proceso;
 
@@ -32,8 +32,7 @@ public class Semaforo {
     private String Verdeblanco ="\u001B[42m"+"\u001B[37m";
     private String RojoBlanco ="\u001B[41m"+"\u001B[37m";
     private String AmarilloNegro="\u001B[43m"+"\u001B[30m";
-		// private int timeout;
-    //public Semaforo(int id_)
+
     public Semaforo(int id_, int n_ , int initialDelay_ ,boolean bearer_)
     {
 				id = id_;
@@ -41,82 +40,68 @@ public class Semaforo {
         initialDelay =initialDelay_;
         bearer =bearer_;
         if(bearer){
-          //crear el token
           Thread a = new Thread(){
-            public void run(){
-              try{
-                token = new Token(n);
-                Naming.rebind("//localhost/Token",token);
-                InterfazLista lista = new Lista();
-                Naming.rebind ("//localhost/Lista", lista);
-                System.out.println("Lista RMI Creada");
-                //LocateRegistry.createRegistry(1099);
-                System.out.println("LocateRegistry ready");
-                System.out.println("creando token");
-                  System.out.println("hola");
-                Thread.sleep(100000);
-                System.out.println("chao");
-              }catch ( Exception a) {
-                a.printStackTrace();
-              }
-            }
+							public void run(){
+									try{
+										InterfazLista lista = new Lista();
+										Naming.rebind ("//localhost/Lista", lista);
+										System.out.println("Lista RMI Creada");
+
+										//LocateRegistry.createRegistry(1099);
+										System.out.println("LocateRegistry ready");
+										System.out.println("creando token");
+											System.out.println("hola");
+										Thread.sleep(100000);
+										System.out.println("chao");
+									}catch ( Exception a) {
+										a.printStackTrace();
+									}
+							}
           };
           a.start();
           try{
-            Thread.sleep(1000);
+							Thread.sleep(1000);
           }catch (Exception e) {
-            e.printStackTrace();
+							e.printStackTrace();
           }
-
-        }else{
-
         }
+
         try
         {
-		// Lugar en el que esta el objeto remoto.
-		// Debe reemplazarse "localhost" por el nombre o ip donde
-		// este corriendo "rmiregistry".
-		// Naming.lookup() obtiene el objeto remoto
-            //InterfazToken token =
-						IntObjeto AToken = new OToken(listsize);
-						Naming.rebind("//localhost/OToken", AToken);
-            //Naming.rebind ("//localhost/TheToken", thetoken);
-						//No puedo realizar lo de arriba... por que me tira un error de que no
-						//es algo remoto.
-						//Creo que tendre que asociar a una "interfaz Remota", para poder
-						//registrar ese, y utilizar el Serializable.
-
-						System.out.println("TheToken Created");
-            token = (InterfazToken)Naming.lookup ("//localhost/Token");
 						lista = (InterfazLista)Naming.lookup ("//localhost/Lista");
-						lista.setSize(listsize);
-						proceso = new Proceso(id);
+						lista.setSize(n_);
+						proceso = new Proceso(id, n_);
+						if(bearer){
+								Token tokenmaestro = new Token(n_);
+								System.out.println("creando token maestro");
+								proceso.asignToken(tokenmaestro);
+						}
+						Naming.rebind ("//localhost/Proceso"+id_, proceso);
+
 						System.out.println ("Añaidendo proceso...");
 						addToList(proceso);
 						System.out.println ("Esperando al resto de los procesos...");
 						waitStart();
-						System.out.println ("Listaylor");
+
+            System.out.println(Verdeblanco+"   Estoy ocioso         "+resetColor);
+						Thread.sleep(initialDelay_);
             
-            // Se realiza la suma remota.
-            ///System.out.print ("2 + 3 = ");
-						// a traves
-						// de objetoRemoto, el servidor realiza el metodo suma (no el cliente), y tengo la
-						// respuesta a través de este
-            ///System.out.println (Token.suma(2,3));
             System.out.println (AmarilloNegro+"   Esperando el Token   "+resetColor);
+						request(id, proceso.secuencia()); //Solicitud a Otros Procesos, de entrar a la Zona Critica
 
             waitToken();
-						takeToken(token);
             System.out.println(RojoBlanco+"   En Zona Critica      "+ resetColor);
+						Thread.sleep(500); //Zona Critica
 
-						//Thread.sleep(timeout);
-						Thread.sleep(initialDelay);
             System.out.println(Verdeblanco+"   Estoy ocioso         "+resetColor);
+						passToken();
+						Thread.sleep(1000000000);
+						/*
 						boolean sali=token.freeToken(id);
             if(sali){
               System.out.println("algo !!");
-              Thread.sleep(100000);
             }
+						*/
         }
         catch (Exception e)
         {
@@ -139,13 +124,8 @@ public class Semaforo {
         }else{
           bearer = false;
         }
-
-
         new Semaforo(id,n,initialDelay,bearer);
-
-				System.out.println("En codigo main");
 				System.exit(1);
-        //new Semaforo(Integer.parseInt(args[0]), Integer.parseInt(args[1])));
     }
 
 		public void addToList(InterfazProceso proceso){
@@ -158,13 +138,36 @@ public class Semaforo {
 			}
 		}
 
+	/**
+	 * Envia mensaje "request" al resto de los procesos, para aplicar el
+	 * algoritmo de Susuki-Kazami
+	 */
 		public void request(int id, int seq){
-
+			try{
+					proceso.takeRequest(id, seq);
+			}
+			catch (Exception e){
+					e.printStackTrace();
+			}
+			for(int i=0; i<n; i++){
+				if(i != id){
+					String url = "//localhost/Proceso"+i;
+					try{
+						InterfazProceso aux = (InterfazProceso)Naming.lookup (url);
+						//aux.print("Si.... proceso "+id+" me esta webeando");
+						if(!aux.takeRequest(id, seq)) 
+							System.out.println("No se cumple condición de algoritmo, request esta outdated");
+					}
+					catch (Exception e){
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 
-
-/*
-    waitStart funcion que espera, al resto de los procesos para iniciar algoritmo*/
+/**
+ * Función que espera, al resto de los procesos para iniciar algoritmo
+ */
 		public void waitStart(){
 			boolean start = false;
 			while(!start){
@@ -179,27 +182,30 @@ public class Semaforo {
 		}
 
 
-/*
-    waitToken funcion que espera el token, inicialmente hace un peticion y esta queda en colada
+/**
+ * Método que espera, que el proceso realcionado con este Semaforo,
+ * obtenga el Token para entrar a la Zona Critica
 */
 		public void waitToken(){
-			boolean asd = true;
-      try{
-        token.getToken(id);
-      }catch(Exception e){
-        e.printStackTrace();
-      }
-			while(asd){
-				try{
-					asd = !token.available(id);
-					Thread.sleep(100);
+				boolean asd = true;
+				System.out.println("en waittoken");
+				while(asd){
+						try{
+								asd = !proceso.hasToken();
+								Thread.sleep(100);
+						}
+						catch(Exception e){
+								e.printStackTrace();
+						}
 				}
-				catch(Exception e){
-					e.printStackTrace();
-				}
-			}
 		}
 
+		/* ESTE METODO TIENE QUE ESTAR EN EL SEMAFORO!!!!*/
+/**
+ * Método de Semaforo/Proceso, el cual toma el Token, una vez que este es
+ * liberado por otro proceso.
+ */
+		/*
 		public void takeToken(InterfazToken token){
 			try{
 				token.soyDe(id);
@@ -208,11 +214,14 @@ public class Semaforo {
 				e.printStackTrace();
 			}
 		}
+		*/
 
+/**
+ * Método que termina la ejecución del proceso; necesario para terminar
+ * con la ejecución del algoritmo Susuki-Kazami.
+ */
 		public void kill(){
 				try{
-						//int pos = lista_.indexOf(proceso);
-						//System.out.println("elimiando proceso en posicion: "+proceso);
 						lista.killProceso(proceso);
 						System.out.println("eliminacion lista");
 				}
@@ -222,4 +231,33 @@ public class Semaforo {
 				System.out.println("x2");
 		}
 
+/**
+ * *** Este metodo, tiene que de alguna manera, utilizarse con "TakeToken", para
+ * obtener el token ***
+ * */
+		public void passToken(){
+				boolean asdf = true;
+				try{
+						while(asdf){
+								Thread.sleep(100);
+								if(proceso.tokenHasQ()){
+										asdf = false;
+										int id_proc = proceso.nextProcess();
+										if(id_proc < n){
+												proceso.actualizarLN();
+												Token aux = proceso.getToken();
+												InterfazProceso proc = 
+													(InterfazProceso)Naming.lookup ("//localhost/Proceso"+id_proc);
+												proc.asignToken(aux);
+												System.out.println("pasando token a "+id_proc);
+										}
+								}
+						}
+				}
+				catch (Exception e){
+						e.printStackTrace();
+				}
+		}
 }
+
+
